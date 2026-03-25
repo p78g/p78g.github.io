@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>ShadowChat V2 - Working</title>
+    <title>ShadowChat</title>
     <style>
         * {
             margin: 0;
@@ -48,18 +48,6 @@
             max-width: 380px;
             width: 100%;
             margin: 0 auto;
-        }
-
-        .visually-hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
         }
 
         .input-group {
@@ -143,38 +131,6 @@
             border: 1px solid rgba(74, 222, 128, 0.2);
         }
 
-        .notification-banner {
-            background: rgba(37, 211, 102, 0.1);
-            border: 1px solid rgba(37, 211, 102, 0.3);
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            font-size: 0.85em;
-        }
-
-        .notification-banner svg {
-            width: 20px;
-            height: 20px;
-            stroke: #25D366;
-            stroke-width: 1.5;
-            fill: none;
-        }
-
-        .notification-banner span {
-            color: #25D366;
-            flex: 1;
-        }
-
-        .enable-notif-btn {
-            background: rgba(37, 211, 102, 0.2);
-            padding: 6px 16px;
-            width: auto;
-        }
-
         .app-container {
             display: none;
             flex-direction: column;
@@ -226,7 +182,6 @@
             margin-bottom: 12px;
             animation: fadeIn 0.2s ease;
             position: relative;
-            user-select: none;
         }
 
         .message.sent {
@@ -288,12 +243,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .embed-video {
-            width: 100%;
-            max-width: 400px;
-            border-radius: 8px;
-        }
-
         .embed-video iframe {
             width: 100%;
             height: 225px;
@@ -308,18 +257,6 @@
             padding: 12px;
             text-decoration: none;
             color: inherit;
-            pointer-events: auto;
-        }
-
-        .embed-url {
-            font-size: 0.7em;
-            opacity: 0.7;
-            margin-bottom: 4px;
-        }
-
-        .embed-title {
-            font-weight: 600;
-            font-size: 0.85em;
         }
 
         .message-image {
@@ -328,7 +265,6 @@
             border-radius: 12px;
             cursor: pointer;
             margin-top: 4px;
-            pointer-events: auto;
         }
 
         .voice-message {
@@ -347,8 +283,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s;
-            pointer-events: auto;
             border: none;
         }
 
@@ -356,10 +290,6 @@
             width: 16px;
             height: 16px;
             fill: white;
-        }
-
-        .message.sent .play-btn {
-            background: rgba(0, 0, 0, 0.2);
         }
 
         .edited-indicator {
@@ -390,20 +320,7 @@
             flex-direction: column;
             gap: 4px;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             min-width: 140px;
-            animation: menuFadeIn 0.15s ease;
-        }
-
-        @keyframes menuFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
         }
 
         .action-menu-item {
@@ -416,7 +333,6 @@
             text-align: left;
             cursor: pointer;
             border-radius: 10px;
-            transition: all 0.1s;
             width: 100%;
         }
 
@@ -463,13 +379,11 @@
             background: #2a2a2a;
             width: 40px;
             height: 40px;
-            padding: 0;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
             border: none;
         }
 
@@ -481,16 +395,8 @@
             fill: none;
         }
 
-        .icon-btn:hover svg {
-            stroke: #25D366;
-        }
-
         .icon-btn.active {
             background: #f87171;
-        }
-
-        .icon-btn.active svg {
-            stroke: white;
         }
 
         .message-input {
@@ -545,11 +451,6 @@
             max-width: 400px;
         }
 
-        .modal-content h3 {
-            color: white;
-            margin-bottom: 16px;
-        }
-
         .modal-content textarea {
             width: 100%;
             padding: 12px;
@@ -558,18 +459,11 @@
             border-radius: 12px;
             color: white;
             margin: 16px 0;
-            font-family: inherit;
-            resize: vertical;
         }
 
         .modal-buttons {
             display: flex;
             gap: 12px;
-        }
-
-        .modal-buttons button {
-            width: auto;
-            padding: 10px 20px;
         }
 
         .image-modal {
@@ -593,10 +487,6 @@
         }
 
         @media (max-width: 768px) {
-            .container {
-                height: 100vh;
-                border-radius: 0;
-            }
             .message-bubble {
                 max-width: 85%;
             }
@@ -607,15 +497,7 @@
     <div class="container">
         <div id="authSection" class="auth-container">
             <div class="auth-form">
-                <h1 class="visually-hidden">ShadowChat</h1>
-                <div id="notificationBanner" class="notification-banner" style="display: none;">
-                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                    </svg>
-                    <span>Enable notifications</span>
-                    <button id="enableNotifBtn" class="enable-notif-btn">Enable</button>
-                </div>
+                <h1 style="background: linear-gradient(135deg, #a78bfa, #ec489a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 32px;">ShadowChat</h1>
                 <div id="errorMessage" class="error-message"></div>
                 <div id="successMessage" class="success-message"></div>
                 
@@ -696,7 +578,7 @@
     </div>
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <h3>Edit Message</h3>
+            <h3 style="color: white; margin-bottom: 16px;">Edit Message</h3>
             <textarea id="editText" rows="3"></textarea>
             <div class="modal-buttons">
                 <button id="saveEditBtn">Save</button>
@@ -719,10 +601,7 @@
     </script>
     
     <script type="module">
-        import { initializeApp } from "firebase/app";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, Timestamp, getDocs, where } from "firebase/firestore";
-
+        // USING YOUR EXISTING FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBJ8wf399dp0nxFYl8y7SoarcDUOiZ7Wow",
             authDomain: "chatappv2-b6bd8.firebaseapp.com",
@@ -732,6 +611,10 @@
             appId: "1:458480303979:web:a3a83ed05856d23df6d62e",
             measurementId: "G-ZS3DQJS2HW"
         };
+
+        import { initializeApp } from "firebase/app";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, Timestamp, getDocs, where } from "firebase/firestore";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -744,7 +627,6 @@
         const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
         const micBtn = document.getElementById('micBtn');
-        const notificationBanner = document.getElementById('notificationBanner');
         const errorDiv = document.getElementById('errorMessage');
         const successDiv = document.getElementById('successMessage');
         const loginForm = document.getElementById('loginForm');
@@ -761,7 +643,6 @@
         const imageModal = document.getElementById('imageModal');
         const modalImage = document.getElementById('modalImage');
 
-        // Global state
         let currentUserId = null;
         let currentUsername = "";
         let messages = [];
@@ -786,28 +667,21 @@
             setTimeout(() => successDiv.style.display = 'none', 3000);
         }
 
-        function requestNotificationPermission() {
-            if (!("Notification" in window)) return;
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    localStorage.setItem('shadowchat_notifications', 'granted');
-                    notificationBanner.style.display = 'none';
-                    showSuccess("Notifications enabled");
-                }
-            });
-        }
-
         // Long press handlers
         function startLongPress(messageId, event) {
-            const target = event.target;
-            if (target.closest('.embed-video iframe') || 
-                target.closest('.embed-link') || 
-                target.closest('.message-image') || 
-                target.closest('.play-btn')) {
-                return;
-            }
             pressTimer = setTimeout(() => {
-                showActionMenu(messageId, event);
+                const message = messages.find(m => m.id === messageId);
+                if (message && message.senderId === currentUserId) {
+                    selectedMessageId = messageId;
+                    let x = event.clientX || (event.touches ? event.touches[0].clientX : 0);
+                    let y = event.clientY || (event.touches ? event.touches[0].clientY : 0);
+                    actionMenu.style.display = 'flex';
+                    actionMenu.style.left = (x - 70) + 'px';
+                    actionMenu.style.top = (y - 60) + 'px';
+                    setTimeout(() => {
+                        document.addEventListener('click', closeActionMenu);
+                    }, 0);
+                }
             }, 500);
         }
 
@@ -815,46 +689,28 @@
             if (pressTimer) clearTimeout(pressTimer);
         }
 
-        function showActionMenu(messageId, event) {
-            const message = messages.find(m => m.id === messageId);
-            if (!message || message.senderId !== currentUserId) return;
-            selectedMessageId = messageId;
-            let x, y;
-            if (event.touches) {
-                x = event.touches[0].clientX;
-                y = event.touches[0].clientY;
-                event.preventDefault();
-            } else {
-                x = event.clientX;
-                y = event.clientY;
-            }
-            actionMenu.style.display = 'flex';
-            actionMenu.style.left = (x - 70) + 'px';
-            actionMenu.style.top = (y - 60) + 'px';
-            setTimeout(() => {
-                document.addEventListener('click', closeActionMenu);
-                document.addEventListener('touchstart', closeActionMenu);
-            }, 0);
-        }
-
         function closeActionMenu() {
             actionMenu.style.display = 'none';
             selectedMessageId = null;
             document.removeEventListener('click', closeActionMenu);
-            document.removeEventListener('touchstart', closeActionMenu);
         }
 
         function editSelectedMessage() {
             if (selectedMessageId) {
-                editMessage(selectedMessageId);
+                const message = messages.find(m => m.id === selectedMessageId);
+                if (message) {
+                    editingMessageId = selectedMessageId;
+                    editText.value = message.content;
+                    editModal.style.display = 'flex';
+                }
                 closeActionMenu();
             }
         }
 
-        function deleteSelectedMessage() {
+        async function deleteSelectedMessage() {
             if (selectedMessageId) {
                 if (confirm("Delete this message?")) {
-                    deleteMessage(selectedMessageId);
+                    await deleteDoc(doc(db, "messages", selectedMessageId));
                 }
                 closeActionMenu();
             }
@@ -863,7 +719,9 @@
         // Voice Recording
         async function startVoiceRecording() {
             if (isRecording) {
-                stopVoiceRecording();
+                if (mediaRecorder) mediaRecorder.stop();
+                isRecording = false;
+                micBtn.classList.remove('active');
                 return;
             }
             try {
@@ -874,7 +732,16 @@
                 mediaRecorder.onstop = () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                     const reader = new FileReader();
-                    reader.onloadend = () => sendVoiceMessage(reader.result);
+                    reader.onloadend = () => {
+                        addDoc(collection(db, "messages"), {
+                            senderId: currentUserId,
+                            senderName: currentUsername,
+                            type: "voice",
+                            content: reader.result,
+                            timestamp: Timestamp.now(),
+                            edited: false
+                        });
+                    };
                     reader.readAsDataURL(audioBlob);
                     stream.getTracks().forEach(track => track.stop());
                 };
@@ -882,30 +749,14 @@
                 isRecording = true;
                 micBtn.classList.add('active');
                 showSuccess("Recording... Tap again to stop");
-                setTimeout(() => { if (isRecording) stopVoiceRecording(); }, 60000);
+                setTimeout(() => {
+                    if (isRecording && mediaRecorder) mediaRecorder.stop();
+                    isRecording = false;
+                    micBtn.classList.remove('active');
+                }, 60000);
             } catch (err) {
                 showError("Microphone access denied");
             }
-        }
-
-        function stopVoiceRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-                micBtn.classList.remove('active');
-            }
-        }
-
-        async function sendVoiceMessage(audioData) {
-            if (!currentUserId) return;
-            await addDoc(collection(db, "messages"), {
-                senderId: currentUserId,
-                senderName: currentUsername,
-                type: "voice",
-                content: audioData,
-                timestamp: Timestamp.now(),
-                edited: false
-            });
         }
 
         // Image Upload
@@ -913,22 +764,19 @@
             const file = input.files[0];
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
-                reader.onload = (e) => sendImageMessage(e.target.result);
+                reader.onload = (e) => {
+                    addDoc(collection(db, "messages"), {
+                        senderId: currentUserId,
+                        senderName: currentUsername,
+                        type: "image",
+                        content: e.target.result,
+                        timestamp: Timestamp.now(),
+                        edited: false
+                    });
+                };
                 reader.readAsDataURL(file);
             }
             input.value = '';
-        }
-
-        async function sendImageMessage(imageData) {
-            if (!currentUserId) return;
-            await addDoc(collection(db, "messages"), {
-                senderId: currentUserId,
-                senderName: currentUsername,
-                type: "image",
-                content: imageData,
-                timestamp: Timestamp.now(),
-                edited: false
-            });
         }
 
         // Play Voice
@@ -936,30 +784,17 @@
             if (currentAudio && !currentAudio.paused) {
                 currentAudio.pause();
                 currentAudio = null;
-                updatePlayButtonIcon(btnElement, false);
+                btnElement.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3" /></svg>`;
                 return;
             }
             const audio = new Audio(audioData);
             currentAudio = audio;
-            updatePlayButtonIcon(btnElement, true);
+            btnElement.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>`;
             audio.play();
             audio.onended = () => {
                 currentAudio = null;
-                updatePlayButtonIcon(btnElement, false);
+                btnElement.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3" /></svg>`;
             };
-        }
-
-        function updatePlayButtonIcon(btn, isPlaying) {
-            if (isPlaying) {
-                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16">
-                    <rect x="6" y="4" width="4" height="16" />
-                    <rect x="14" y="4" width="4" height="16" />
-                </svg>`;
-            } else {
-                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                </svg>`;
-            }
         }
 
         // Detect and embed links
@@ -978,69 +813,19 @@
                         videoId = url.split('v=')[1]?.split('&')[0];
                     }
                     if (videoId) {
-                        embeds.push({ type: 'youtube', url: `https://www.youtube.com/embed/${videoId}`, originalUrl: url });
+                        embeds.push({ type: 'youtube', url: `https://www.youtube.com/embed/${videoId}` });
                         processedText = processedText.replace(url, '');
                     }
-                } else if (url.includes('vimeo.com/')) {
-                    const vimeoId = url.split('vimeo.com/')[1].split('?')[0];
-                    embeds.push({ type: 'vimeo', url: `https://player.vimeo.com/video/${vimeoId}`, originalUrl: url });
-                    processedText = processedText.replace(url, '');
                 } else {
-                    embeds.push({ type: 'link', url: url, originalUrl: url });
+                    embeds.push({ type: 'link', url: url });
                 }
             }
             return { text: processedText.trim(), embeds };
         }
 
-        // Edit Message
-        async function editMessage(id) {
-            const message = messages.find(m => m.id === id);
-            if (message && message.senderId === currentUserId) {
-                editingMessageId = id;
-                editText.value = message.content;
-                editModal.style.display = 'flex';
-            }
-        }
-
-        async function saveEdit() {
-            const newContent = editText.value.trim();
-            if (newContent && editingMessageId) {
-                const msgRef = doc(db, "messages", editingMessageId);
-                await updateDoc(msgRef, {
-                    content: newContent,
-                    edited: true,
-                    editedAt: Timestamp.now()
-                });
-                closeEditModal();
-            }
-        }
-
-        function closeEditModal() {
-            editModal.style.display = 'none';
-            editingMessageId = null;
-        }
-
-        async function deleteMessage(id) {
-            const msgRef = doc(db, "messages", id);
-            await deleteDoc(msgRef);
-        }
-
-        // View Image
-        function viewImage(imageData) {
-            modalImage.src = imageData;
-            imageModal.style.display = 'flex';
-        }
-
-        function closeImageModal() {
-            imageModal.style.display = 'none';
-        }
-
         // Send text message
         async function sendMessage() {
-            if (!currentUserId) {
-                showError("Not logged in");
-                return;
-            }
+            if (!currentUserId) return;
             const content = messageInput.value.trim();
             if (!content) return;
             const { text, embeds } = detectAndEmbedLinks(content);
@@ -1055,6 +840,31 @@
             });
             messageInput.value = '';
             messageInput.style.height = 'auto';
+        }
+
+        // Save edited message
+        async function saveEdit() {
+            const newContent = editText.value.trim();
+            if (newContent && editingMessageId) {
+                const msgRef = doc(db, "messages", editingMessageId);
+                await updateDoc(msgRef, {
+                    content: newContent,
+                    edited: true,
+                    editedAt: Timestamp.now()
+                });
+            }
+            editModal.style.display = 'none';
+            editingMessageId = null;
+        }
+
+        // View Image
+        function viewImage(imageData) {
+            modalImage.src = imageData;
+            imageModal.style.display = 'flex';
+        }
+
+        function closeImageModal() {
+            imageModal.style.display = 'none';
         }
 
         // Render messages
@@ -1074,9 +884,7 @@
                     contentHtml = `
                         <div class="voice-message">
                             <button class="play-btn" onclick="window.playVoiceExternal('${msg.content}', this)" style="pointer-events: auto;">
-                                <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
-                                    <polygon points="5 3 19 12 5 21 5 3" />
-                                </svg>
+                                <svg viewBox="0 0 24 24" fill="white" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3" /></svg>
                             </button>
                             <span class="voice-duration">Voice note</span>
                         </div>
@@ -1087,7 +895,7 @@
                     contentHtml = `<div class="message-content">${textContent}</div>`;
                     if (msg.embeds && msg.embeds.length > 0) {
                         msg.embeds.forEach(embed => {
-                            if (embed.type === 'youtube' || embed.type === 'vimeo') {
+                            if (embed.type === 'youtube') {
                                 contentHtml += `
                                     <div class="link-embed">
                                         <div class="embed-video">
@@ -1109,11 +917,10 @@
                     }
                 }
                 const editedHtml = msg.edited ? '<span class="edited-indicator">edited</span>' : '';
-                const safeId = msg.id.replace(/'/g, "\\'");
                 return `
                     <div class="message ${isSent ? 'sent' : 'received'}"
-                         onmousedown="window.startLongPressExternal('${safeId}', event)"
-                         ontouchstart="window.startLongPressExternal('${safeId}', event)"
+                         onmousedown="window.startLongPressExternal('${msg.id}', event)"
+                         ontouchstart="window.startLongPressExternal('${msg.id}', event)"
                          onmouseup="window.cancelLongPressExternal()"
                          ontouchend="window.cancelLongPressExternal()"
                          onmouseleave="window.cancelLongPressExternal()">
@@ -1168,30 +975,15 @@
             const username = registerUsername.value.trim();
             const password = registerPassword.value;
             const confirm = confirmPassword.value;
-            if (!username || !password) {
-                showError('Fill all fields');
-                return;
-            }
-            if (password !== confirm) {
-                showError('Passwords do not match');
-                return;
-            }
-            if (username.length < 3) {
-                showError('Username must be at least 3 characters');
-                return;
-            }
-            if (password.length < 4) {
-                showError('Password must be at least 4 characters');
-                return;
-            }
+            if (!username || !password) return showError('Fill all fields');
+            if (password !== confirm) return showError('Passwords do not match');
+            if (username.length < 3) return showError('Username must be at least 3 characters');
+            if (password.length < 4) return showError('Password must be at least 4 characters');
             
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("username", "==", username));
             const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                showError("Username already taken");
-                return;
-            }
+            if (!querySnapshot.empty) return showError("Username already taken");
             
             const email = `${username}@shadowchat.local`;
             try {
@@ -1201,12 +993,10 @@
                     username: username,
                     email: email
                 });
-                showSuccess('Account created! Logging in...');
+                showSuccess('Account created! You are now logged in.');
                 registerUsername.value = '';
                 registerPassword.value = '';
                 confirmPassword.value = '';
-                // Auto login after registration
-                await signInWithEmailAndPassword(auth, email, password);
             } catch (err) {
                 showError(err.message);
             }
@@ -1215,18 +1005,13 @@
         async function login() {
             const username = loginUsername.value.trim();
             const password = loginPassword.value;
-            if (!username || !password) {
-                showError('Enter username and password');
-                return;
-            }
+            if (!username || !password) return showError('Enter username and password');
             
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("username", "==", username));
             const querySnapshot = await getDocs(q);
-            if (querySnapshot.empty) {
-                showError("User not found");
-                return;
-            }
+            if (querySnapshot.empty) return showError("User not found");
+            
             const userDoc = querySnapshot.docs[0];
             const email = userDoc.data().email;
             try {
@@ -1270,7 +1055,6 @@
         });
 
         // Attach event listeners
-        document.getElementById('enableNotifBtn').addEventListener('click', requestNotificationPermission);
         document.getElementById('loginBtn').addEventListener('click', login);
         document.getElementById('registerBtn').addEventListener('click', register);
         document.getElementById('logoutBtn').addEventListener('click', logout);
@@ -1289,10 +1073,13 @@
         document.getElementById('editAction').addEventListener('click', editSelectedMessage);
         document.getElementById('deleteAction').addEventListener('click', deleteSelectedMessage);
         document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
-        document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
+        document.getElementById('cancelEditBtn').addEventListener('click', () => {
+            editModal.style.display = 'none';
+            editingMessageId = null;
+        });
         imageModal.addEventListener('click', closeImageModal);
 
-        // Expose external functions for inline event handlers
+        // Expose external functions
         window.startLongPressExternal = startLongPress;
         window.cancelLongPressExternal = cancelLongPress;
         window.viewImageExternal = viewImage;
@@ -1309,13 +1096,6 @@
                 sendMessage();
             }
         });
-
-        // Notification banner
-        if (Notification.permission === "default") {
-            notificationBanner.style.display = 'flex';
-        } else if (Notification.permission === "granted") {
-            notificationBanner.style.display = 'none';
-        }
     </script>
 </body>
 </html>
