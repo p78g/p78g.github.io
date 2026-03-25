@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecureMessage - Private Messaging Platform</title>
+    <title>ShadowChat - Private Messaging</title>
     <style>
         * {
             margin: 0;
@@ -12,8 +12,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #0a0a0a;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -22,12 +22,12 @@
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: #1a1a1a;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1000px;
             height: 90vh;
             display: flex;
             flex-direction: column;
@@ -36,19 +36,28 @@
         /* Auth Forms */
         .auth-container {
             padding: 40px;
-            background: white;
+            background: #1a1a1a;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
         }
 
         .auth-form {
-            max-width: 400px;
+            max-width: 380px;
+            width: 100%;
             margin: 0 auto;
         }
 
         .auth-form h2 {
-            color: #667eea;
-            margin-bottom: 30px;
+            background: linear-gradient(135deg, #a78bfa 0%, #ec489a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 32px;
             font-size: 2em;
+            font-weight: 600;
         }
 
         .input-group {
@@ -59,60 +68,87 @@
         .input-group label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
+            color: #9ca3af;
             font-weight: 500;
+            font-size: 0.9em;
         }
 
         .input-group input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            padding: 12px 16px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #ffffff;
+            transition: all 0.2s;
         }
 
         .input-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #a78bfa;
+            background: #2f2f2f;
+        }
+
+        .input-group input::placeholder {
+            color: #6b7280;
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #a78bfa 0%, #ec489a 100%);
             color: white;
-            padding: 12px 30px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
             width: 100%;
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px -10px rgba(167, 139, 250, 0.4);
         }
 
         .switch-auth {
-            margin-top: 20px;
-            color: #666;
+            margin-top: 24px;
+            color: #9ca3af;
+            font-size: 0.9em;
         }
 
         .switch-auth a {
-            color: #667eea;
+            color: #a78bfa;
             cursor: pointer;
             text-decoration: none;
             font-weight: 500;
         }
 
+        .switch-auth a:hover {
+            text-decoration: underline;
+        }
+
         .error-message {
-            color: #e74c3c;
-            background: #fde8e8;
-            padding: 10px;
-            border-radius: 8px;
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
+            padding: 12px;
+            border-radius: 12px;
             margin-bottom: 20px;
             display: none;
+            font-size: 0.9em;
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .success-message {
+            color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 0.9em;
+            border: 1px solid rgba(74, 222, 128, 0.2);
         }
 
         /* Main App */
@@ -123,44 +159,63 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
+            background: #0f0f0f;
+            padding: 20px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .header h2 {
+            background: linear-gradient(135deg, #a78bfa 0%, #ec489a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.5em;
         }
 
         .user-info {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             align-items: center;
         }
 
         .username-display {
-            font-weight: bold;
-            font-size: 1.1em;
+            color: #a78bfa;
+            font-weight: 600;
+            font-size: 0.95em;
+            background: rgba(167, 139, 250, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
         }
 
         .logout-btn {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 16px;
             width: auto;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: none;
+            box-shadow: none;
         }
 
         .messages-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
-            background: #f8f9fa;
+            padding: 24px;
+            background: #0f0f0f;
         }
 
         .message {
-            background: white;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: #1a1a1a;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 16px;
+            border: 1px solid #2a2a2a;
             animation: fadeIn 0.3s ease;
         }
 
@@ -178,58 +233,86 @@
         .message-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             padding-bottom: 8px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #2a2a2a;
         }
 
         .message-sender {
-            font-weight: bold;
-            color: #667eea;
+            font-weight: 600;
+            color: #a78bfa;
+            font-size: 0.9em;
         }
 
         .message-time {
-            color: #999;
-            font-size: 0.85em;
+            color: #6b7280;
+            font-size: 0.75em;
         }
 
         .message-content {
-            color: #333;
+            color: #e5e7eb;
             line-height: 1.5;
+            font-size: 0.95em;
         }
 
         .message-input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
+            padding: 20px 24px;
+            background: #0f0f0f;
+            border-top: 1px solid #2a2a2a;
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .message-input {
             flex: 1;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 12px 16px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #ffffff;
             resize: none;
             font-family: inherit;
         }
 
         .message-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #a78bfa;
+            background: #1f1f1f;
+        }
+
+        .message-input::placeholder {
+            color: #6b7280;
         }
 
         .send-btn {
             width: auto;
-            padding: 12px 30px;
+            padding: 12px 28px;
         }
 
         .empty-messages {
             text-align: center;
-            color: #999;
-            padding: 40px;
+            color: #6b7280;
+            padding: 60px 20px;
+            font-size: 0.9em;
+        }
+
+        /* Scrollbar */
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #3a3a3a;
+            border-radius: 3px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: #4a4a4a;
         }
 
         @media (max-width: 768px) {
@@ -245,6 +328,10 @@
             .send-btn {
                 width: 100%;
             }
+
+            .auth-container {
+                padding: 24px;
+            }
         }
     </style>
 </head>
@@ -253,8 +340,9 @@
         <!-- Authentication Section -->
         <div id="authSection" class="auth-container">
             <div class="auth-form">
-                <h2>📨 SecureMessage</h2>
+                <h2>✦ ShadowChat</h2>
                 <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
                 
                 <div id="loginForm">
                     <div class="input-group">
@@ -265,9 +353,9 @@
                         <label>Password</label>
                         <input type="password" id="loginPassword" placeholder="Enter your password">
                     </div>
-                    <button onclick="login()">Login</button>
+                    <button onclick="login()">Sign In</button>
                     <div class="switch-auth">
-                        Don't have an account? <a onclick="showRegister()">Register here</a>
+                        No account? <a onclick="showRegister()">Create one</a>
                     </div>
                 </div>
 
@@ -284,9 +372,9 @@
                         <label>Confirm Password</label>
                         <input type="password" id="confirmPassword" placeholder="Confirm your password">
                     </div>
-                    <button onclick="register()">Register</button>
+                    <button onclick="register()">Create Account</button>
                     <div class="switch-auth">
-                        Already have an account? <a onclick="showLogin()">Login here</a>
+                        Already have an account? <a onclick="showLogin()">Sign in</a>
                     </div>
                 </div>
             </div>
@@ -295,75 +383,54 @@
         <!-- Main App Section -->
         <div id="appSection" class="app-container">
             <div class="header">
-                <h2>📨 SecureMessage</h2>
+                <h2>✦ ShadowChat</h2>
                 <div class="user-info">
                     <span class="username-display" id="currentUsername"></span>
-                    <button onclick="logout()" class="logout-btn">Logout</button>
+                    <button onclick="logout()" class="logout-btn">Exit</button>
                 </div>
             </div>
             <div class="messages-container" id="messagesContainer">
                 <div class="empty-messages">No messages yet. Start the conversation!</div>
             </div>
             <div class="message-input-container">
-                <textarea class="message-input" id="messageInput" rows="2" placeholder="Type your message here..."></textarea>
-                <button onclick="sendMessage()" class="send-btn">Send Message</button>
+                <textarea class="message-input" id="messageInput" rows="2" placeholder="Type your message..."></textarea>
+                <button onclick="sendMessage()" class="send-btn">Send</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Data storage structure
+        // Data storage
         let users = {};
         let messages = [];
         let currentUser = null;
 
-        // Initialize data from localStorage
+        // Load data from localStorage
         function loadData() {
-            const storedUsers = localStorage.getItem('securemessage_users');
-            const storedMessages = localStorage.getItem('securemessage_messages');
+            const storedUsers = localStorage.getItem('shadowchat_users');
+            const storedMessages = localStorage.getItem('shadowchat_messages');
             
             if (storedUsers) {
                 users = JSON.parse(storedUsers);
             } else {
-                // Create demo user
-                users = {
-                    'demo': {
-                        username: 'demo',
-                        password: btoa('demo123'),
-                        createdAt: new Date().toISOString()
-                    }
-                };
+                users = {};
                 saveUsers();
             }
             
             if (storedMessages) {
                 messages = JSON.parse(storedMessages);
             } else {
-                // Add some demo messages
-                messages = [
-                    {
-                        id: Date.now(),
-                        sender: 'demo',
-                        content: 'Welcome to SecureMessage! This is a demo message.',
-                        timestamp: new Date().toISOString()
-                    },
-                    {
-                        id: Date.now() + 1,
-                        sender: 'demo',
-                        content: 'Create an account and start messaging!',
-                        timestamp: new Date().toISOString()
-                    }
-                ];
+                messages = [];
                 saveMessages();
             }
         }
 
         function saveUsers() {
-            localStorage.setItem('securemessage_users', JSON.stringify(users));
+            localStorage.setItem('shadowchat_users', JSON.stringify(users));
         }
 
         function saveMessages() {
-            localStorage.setItem('securemessage_messages', JSON.stringify(messages));
+            localStorage.setItem('shadowchat_messages', JSON.stringify(messages));
         }
 
         function showError(message) {
@@ -375,16 +442,27 @@
             }, 3000);
         }
 
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
         function showRegister() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
             document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
         }
 
         function showLogin() {
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
         }
 
         function register() {
@@ -394,6 +472,16 @@
 
             if (!username || !password) {
                 showError('Please fill in all fields');
+                return;
+            }
+
+            if (username.length < 3) {
+                showError('Username must be at least 3 characters');
+                return;
+            }
+
+            if (password.length < 4) {
+                showError('Password must be at least 4 characters');
                 return;
             }
 
@@ -410,13 +498,18 @@
             // Create new user
             users[username] = {
                 username: username,
-                password: btoa(password), // Simple encoding (not secure for production)
+                password: btoa(password),
                 createdAt: new Date().toISOString()
             };
             saveUsers();
 
-            showLogin();
-            showError('Account created successfully! Please login.');
+            showSuccess('Account created successfully!');
+            setTimeout(() => {
+                showLogin();
+                document.getElementById('registerUsername').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            }, 1500);
         }
 
         function login() {
@@ -435,7 +528,7 @@
             }
 
             currentUser = username;
-            localStorage.setItem('securemessage_currentUser', currentUser);
+            localStorage.setItem('shadowchat_currentUser', currentUser);
             
             // Switch to main app
             document.getElementById('authSection').style.display = 'none';
@@ -443,15 +536,17 @@
             document.getElementById('currentUsername').textContent = currentUser;
             
             loadMessages();
+            
+            // Clear login fields
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
         }
 
         function logout() {
             currentUser = null;
-            localStorage.removeItem('securemessage_currentUser');
-            document.getElementById('authSection').style.display = 'block';
+            localStorage.removeItem('shadowchat_currentUser');
+            document.getElementById('authSection').style.display = 'flex';
             document.getElementById('appSection').style.display = 'none';
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
         }
 
         function sendMessage() {
@@ -460,10 +555,7 @@
             const messageInput = document.getElementById('messageInput');
             const content = messageInput.value.trim();
             
-            if (!content) {
-                showError('Please enter a message');
-                return;
-            }
+            if (!content) return;
 
             const newMessage = {
                 id: Date.now(),
@@ -509,11 +601,11 @@
             const now = new Date();
             const diff = now - date;
             
-            if (diff < 60000) return 'Just now';
-            if (diff < 3600000) return `${Math.floor(diff / 60000)} minutes ago`;
+            if (diff < 60000) return 'just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
             if (diff < 86400000) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
         }
 
         function escapeHtml(text) {
@@ -524,20 +616,17 @@
 
         // Check for existing session
         function checkSession() {
-            const savedUser = localStorage.getItem('securemessage_currentUser');
+            const savedUser = localStorage.getItem('shadowchat_currentUser');
             if (savedUser && users[savedUser]) {
                 currentUser = savedUser;
                 document.getElementById('authSection').style.display = 'none';
                 document.getElementById('appSection').style.display = 'flex';
                 document.getElementById('currentUsername').textContent = currentUser;
                 loadMessages();
-            } else {
-                document.getElementById('authSection').style.display = 'block';
-                document.getElementById('appSection').style.display = 'none';
             }
         }
 
-        // Auto-refresh messages every 2 seconds
+        // Auto-refresh messages
         let refreshInterval = null;
         
         function startAutoRefresh() {
@@ -549,16 +638,21 @@
             }, 2000);
         }
 
-        // Initialize the app
+        // Initialize
         loadData();
         checkSession();
         startAutoRefresh();
 
-        // Allow Enter key to send message
-        document.getElementById('messageInput')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
+        // Allow Enter to send (Shift+Enter for new line)
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+                messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
             }
         });
     </script>
