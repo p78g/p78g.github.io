@@ -412,25 +412,31 @@
             
             if (storedUsers) {
                 users = JSON.parse(storedUsers);
+                console.log('✅ Loaded users:', Object.keys(users).length);
             } else {
                 users = {};
+                console.log('📝 No users found, starting fresh');
                 saveUsers();
             }
             
             if (storedMessages) {
                 messages = JSON.parse(storedMessages);
+                console.log('✅ Loaded messages:', messages.length);
             } else {
                 messages = [];
+                console.log('📝 No messages found, starting fresh');
                 saveMessages();
             }
         }
 
         function saveUsers() {
             localStorage.setItem('shadowchat_users', JSON.stringify(users));
+            console.log('💾 Users saved to localStorage');
         }
 
         function saveMessages() {
             localStorage.setItem('shadowchat_messages', JSON.stringify(messages));
+            console.log('💾 Messages saved to localStorage:', messages.length);
         }
 
         function showError(message) {
@@ -535,6 +541,13 @@
             document.getElementById('appSection').style.display = 'flex';
             document.getElementById('currentUsername').textContent = currentUser;
             
+            // Reload messages from storage to ensure they're fresh
+            const storedMessages = localStorage.getItem('shadowchat_messages');
+            if (storedMessages) {
+                messages = JSON.parse(storedMessages);
+                console.log('📨 Reloaded messages on login:', messages.length);
+            }
+            
             loadMessages();
             
             // Clear login fields
@@ -547,6 +560,9 @@
             localStorage.removeItem('shadowchat_currentUser');
             document.getElementById('authSection').style.display = 'flex';
             document.getElementById('appSection').style.display = 'none';
+            
+            // Clear the messages container
+            document.getElementById('messagesContainer').innerHTML = '<div class="empty-messages">No messages yet. Start the conversation!</div>';
         }
 
         function sendMessage() {
@@ -565,21 +581,28 @@
             };
             
             messages.push(newMessage);
-            saveMessages();
+            saveMessages(); // Save immediately to localStorage
+            console.log('📤 Message sent and saved:', newMessage);
             
             messageInput.value = '';
-            loadMessages();
+            loadMessages(); // Refresh display
         }
 
         function loadMessages() {
             const container = document.getElementById('messagesContainer');
             
-            if (messages.length === 0) {
+            // Always read the latest messages from localStorage
+            const storedMessages = localStorage.getItem('shadowchat_messages');
+            if (storedMessages) {
+                messages = JSON.parse(storedMessages);
+            }
+            
+            if (!messages || messages.length === 0) {
                 container.innerHTML = '<div class="empty-messages">No messages yet. Start the conversation!</div>';
                 return;
             }
             
-            // Sort messages by timestamp
+            // Sort messages by timestamp (oldest first)
             const sortedMessages = [...messages].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
             
             container.innerHTML = sortedMessages.map(message => `
@@ -622,23 +645,41 @@
                 document.getElementById('authSection').style.display = 'none';
                 document.getElementById('appSection').style.display = 'flex';
                 document.getElementById('currentUsername').textContent = currentUser;
+                
+                // Load messages from storage
+                const storedMessages = localStorage.getItem('shadowchat_messages');
+                if (storedMessages) {
+                    messages = JSON.parse(storedMessages);
+                    console.log('📨 Loaded messages from session:', messages.length);
+                }
+                
                 loadMessages();
             }
         }
 
-        // Auto-refresh messages
+        // Auto-refresh messages (but don't overwrite, just read latest)
         let refreshInterval = null;
         
         function startAutoRefresh() {
             if (refreshInterval) clearInterval(refreshInterval);
             refreshInterval = setInterval(() => {
                 if (currentUser) {
-                    loadMessages();
+                    // Just refresh the display by reading latest from localStorage
+                    const storedMessages = localStorage.getItem('shadowchat_messages');
+                    if (storedMessages) {
+                        const newMessages = JSON.parse(storedMessages);
+                        // Only update if there's a change (to avoid flicker)
+                        if (JSON.stringify(messages) !== JSON.stringify(newMessages)) {
+                            messages = newMessages;
+                            loadMessages();
+                            console.log('🔄 Auto-refresh: updated messages');
+                        }
+                    }
                 }
             }, 2000);
         }
 
-        // Initialize
+        // Initialize everything
         loadData();
         checkSession();
         startAutoRefresh();
