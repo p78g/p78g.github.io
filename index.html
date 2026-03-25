@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>ShadowChat V2</title>
+    <title>ShadowChat V2 - Working</title>
     <style>
         * {
             margin: 0;
@@ -607,7 +607,7 @@
     <div class="container">
         <div id="authSection" class="auth-container">
             <div class="auth-form">
-                <h1 class="visually-hidden">ShadowChat V2</h1>
+                <h1 class="visually-hidden">ShadowChat</h1>
                 <div id="notificationBanner" class="notification-banner" style="display: none;">
                     <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -662,7 +662,9 @@
                     <button id="logoutBtn" class="logout-btn">Exit</button>
                 </div>
             </div>
-            <div class="messages-container" id="messagesContainer"></div>
+            <div class="messages-container" id="messagesContainer">
+                <div class="empty-messages">No messages yet. Start the conversation!</div>
+            </div>
             <div class="message-input-container">
                 <div class="input-buttons">
                     <button id="imageUploadBtn" class="icon-btn">
@@ -772,7 +774,6 @@
         let pressTimer = null;
         let editingMessageId = null;
 
-        // Helper functions
         function showError(msg) {
             errorDiv.textContent = msg;
             errorDiv.style.display = 'block';
@@ -785,7 +786,6 @@
             setTimeout(() => successDiv.style.display = 'none', 3000);
         }
 
-        // Notifications
         function requestNotificationPermission() {
             if (!("Notification" in window)) return;
             Notification.requestPermission().then(permission => {
@@ -1037,6 +1037,10 @@
 
         // Send text message
         async function sendMessage() {
+            if (!currentUserId) {
+                showError("Not logged in");
+                return;
+            }
             const content = messageInput.value.trim();
             if (!content) return;
             const { text, embeds } = detectAndEmbedLinks(content);
@@ -1057,7 +1061,7 @@
         function renderMessages() {
             if (!messagesContainer) return;
             if (!messages.length) {
-                messagesContainer.innerHTML = '<div class="empty-messages">No messages yet</div>';
+                messagesContainer.innerHTML = '<div class="empty-messages">No messages yet. Start the conversation!</div>';
                 return;
             }
             const sorted = [...messages].sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
@@ -1164,14 +1168,29 @@
             const username = registerUsername.value.trim();
             const password = registerPassword.value;
             const confirm = confirmPassword.value;
-            if (!username || !password) return showError('Fill all fields');
-            if (password !== confirm) return showError('Passwords do not match');
+            if (!username || !password) {
+                showError('Fill all fields');
+                return;
+            }
+            if (password !== confirm) {
+                showError('Passwords do not match');
+                return;
+            }
+            if (username.length < 3) {
+                showError('Username must be at least 3 characters');
+                return;
+            }
+            if (password.length < 4) {
+                showError('Password must be at least 4 characters');
+                return;
+            }
             
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("username", "==", username));
             const querySnapshot = await getDocs(q);
             if (!querySnapshot.empty) {
-                return showError("Username already taken");
+                showError("Username already taken");
+                return;
             }
             
             const email = `${username}@shadowchat.local`;
@@ -1182,10 +1201,12 @@
                     username: username,
                     email: email
                 });
-                showSuccess('Account created! You are now logged in.');
+                showSuccess('Account created! Logging in...');
                 registerUsername.value = '';
                 registerPassword.value = '';
                 confirmPassword.value = '';
+                // Auto login after registration
+                await signInWithEmailAndPassword(auth, email, password);
             } catch (err) {
                 showError(err.message);
             }
@@ -1194,13 +1215,17 @@
         async function login() {
             const username = loginUsername.value.trim();
             const password = loginPassword.value;
-            if (!username || !password) return showError('Enter username and password');
+            if (!username || !password) {
+                showError('Enter username and password');
+                return;
+            }
             
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("username", "==", username));
             const querySnapshot = await getDocs(q);
             if (querySnapshot.empty) {
-                return showError("User not found");
+                showError("User not found");
+                return;
             }
             const userDoc = querySnapshot.docs[0];
             const email = userDoc.data().email;
