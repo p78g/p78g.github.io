@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>ShadowChat</title>
+    <title>ShadowChat - Public & Private Chats</title>
     <style>
         * {
             margin: 0;
@@ -15,52 +15,42 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: #0a0a0a;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: #1a1a1a;
-            border-radius: 24px;
+            height: 100vh;
             overflow: hidden;
-            width: 100%;
-            max-width: 1000px;
-            height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        .auth-container {
-            padding: 40px;
-            background: #1a1a1a;
-            text-align: center;
+        /* Auth Screen */
+        .auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0a0a0a;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 500px;
+            z-index: 100;
         }
 
-        .auth-form {
+        .auth-box {
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
             max-width: 380px;
-            width: 100%;
-            margin: 0 auto;
+        }
+
+        .auth-box h1 {
+            background: linear-gradient(135deg, #a78bfa, #ec489a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 32px;
+            text-align: center;
         }
 
         .input-group {
             margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #9ca3af;
-            font-weight: 500;
-            font-size: 0.9em;
         }
 
         .input-group input {
@@ -70,88 +60,82 @@
             border: 1px solid #3a3a3a;
             border-radius: 12px;
             font-size: 15px;
-            color: #ffffff;
-            transition: all 0.2s;
+            color: white;
         }
 
         .input-group input:focus {
             outline: none;
             border-color: #25D366;
-            background: #2f2f2f;
         }
 
-        button {
+        .auth-btn {
             background: #25D366;
             color: white;
-            padding: 12px 24px;
+            padding: 12px;
             border: none;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
             width: 100%;
-        }
-
-        button:hover {
-            background: #20b859;
-            transform: translateY(-1px);
+            margin-top: 10px;
         }
 
         .switch-auth {
-            margin-top: 24px;
+            text-align: center;
+            margin-top: 20px;
             color: #9ca3af;
-            font-size: 0.9em;
         }
 
         .switch-auth a {
             color: #25D366;
             cursor: pointer;
-            text-decoration: none;
-            font-weight: 500;
         }
 
-        .error-message, .success-message {
+        .error-msg, .success-msg {
             padding: 12px;
             border-radius: 12px;
             margin-bottom: 20px;
             display: none;
-            font-size: 0.9em;
+            font-size: 14px;
         }
 
-        .error-message {
-            color: #f87171;
+        .error-msg {
             background: rgba(248, 113, 113, 0.1);
+            color: #f87171;
             border: 1px solid rgba(248, 113, 113, 0.2);
         }
 
-        .success-message {
-            color: #4ade80;
+        .success-msg {
             background: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
             border: 1px solid rgba(74, 222, 128, 0.2);
         }
 
-        .app-container {
+        /* Main App */
+        .app-main {
             display: none;
-            flex-direction: column;
-            height: 100%;
-            background: #0a0a0a;
+            height: 100vh;
         }
 
-        .header {
+        .sidebar {
+            width: 300px;
             background: #1a1a1a;
-            padding: 16px 20px;
+            border-right: 1px solid #2a2a2a;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
             border-bottom: 1px solid #2a2a2a;
         }
 
         .user-info {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 16px;
-            margin-left: auto;
+            margin-bottom: 16px;
         }
 
         .username-display {
@@ -164,15 +148,99 @@
 
         .logout-btn {
             background: rgba(255, 255, 255, 0.05);
-            padding: 6px 16px;
-            width: auto;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            background: #25D366;
+            padding: 10px;
+            border-radius: 12px;
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .chats-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .chat-item {
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .chat-item:hover {
+            background: #2a2a2a;
+        }
+
+        .chat-item.active {
+            background: #2a2a2a;
+            border-left: 3px solid #25D366;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            color: white;
+        }
+
+        .chat-type {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        /* Main Chat */
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: #1a1a1a;
+            padding: 16px 20px;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            display: none;
+            background: #2a2a2a;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+
+        .chat-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .chat-subtitle {
+            font-size: 12px;
+            color: #9ca3af;
         }
 
         .messages-container {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            background: #0a0a0a;
             display: flex;
             flex-direction: column;
         }
@@ -180,7 +248,6 @@
         .message {
             display: flex;
             margin-bottom: 12px;
-            animation: fadeIn 0.2s ease;
             position: relative;
         }
 
@@ -196,8 +263,7 @@
             max-width: 70%;
             padding: 8px 12px;
             border-radius: 18px;
-            position: relative;
-            word-wrap: break-word;
+            cursor: pointer;
         }
 
         .message.sent .message-bubble {
@@ -221,7 +287,6 @@
         }
 
         .message.sent .message-sender {
-            color: rgba(255, 255, 255, 0.9);
             text-align: right;
         }
 
@@ -247,16 +312,19 @@
             width: 100%;
             height: 225px;
             border: none;
-            border-radius: 8px;
         }
 
         .embed-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
             padding: 12px;
             text-decoration: none;
             color: inherit;
+            display: block;
+        }
+
+        .embed-url {
+            font-size: 0.7em;
+            opacity: 0.7;
+            word-break: break-all;
         }
 
         .message-image {
@@ -271,7 +339,6 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            min-width: 200px;
         }
 
         .play-btn {
@@ -294,13 +361,8 @@
 
         .edited-indicator {
             font-size: 0.7em;
-            font-weight: 500;
             margin-left: 6px;
             color: #a78bfa;
-            background: rgba(167, 139, 250, 0.15);
-            padding: 2px 6px;
-            border-radius: 12px;
-            display: inline-block;
         }
 
         .message-time {
@@ -318,7 +380,6 @@
             padding: 8px;
             display: none;
             flex-direction: column;
-            gap: 4px;
             z-index: 1000;
             min-width: 140px;
         }
@@ -327,13 +388,10 @@
             padding: 10px 16px;
             background: none;
             border: none;
-            color: #e5e7eb;
-            font-size: 14px;
-            font-weight: 500;
+            color: white;
             text-align: left;
             cursor: pointer;
             border-radius: 10px;
-            width: 100%;
         }
 
         .action-menu-item:hover {
@@ -342,23 +400,6 @@
 
         .action-menu-item.delete {
             color: #f87171;
-        }
-
-        .action-menu-divider {
-            height: 1px;
-            background: #3a3a3a;
-            margin: 4px 0;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .message-input-container {
@@ -391,7 +432,6 @@
             width: 20px;
             height: 20px;
             stroke: #9ca3af;
-            stroke-width: 1.5;
             fill: none;
         }
 
@@ -405,29 +445,19 @@
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
             border-radius: 24px;
-            font-size: 15px;
-            color: #ffffff;
+            color: white;
             resize: none;
             font-family: inherit;
-            max-height: 100px;
-        }
-
-        .message-input:focus {
-            outline: none;
-            border-color: #25D366;
         }
 
         .send-btn {
             background: #25D366;
             padding: 12px 24px;
-            width: auto;
             border-radius: 24px;
-        }
-
-        .empty-messages {
-            text-align: center;
-            color: #6b7280;
-            padding: 60px 20px;
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         .modal {
@@ -437,7 +467,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0,0,0,0.8);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -451,7 +481,7 @@
             max-width: 400px;
         }
 
-        .modal-content textarea {
+        .user-search {
             width: 100%;
             padding: 12px;
             background: #2a2a2a;
@@ -461,102 +491,114 @@
             margin: 16px 0;
         }
 
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
+        .user-list {
+            max-height: 300px;
+            overflow-y: auto;
         }
 
-        .image-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
+        .user-item {
+            padding: 12px;
             cursor: pointer;
-        }
-
-        .image-modal img {
-            max-width: 90%;
-            max-height: 90%;
             border-radius: 8px;
         }
 
+        .user-item:hover {
+            background: #2a2a2a;
+        }
+
         @media (max-width: 768px) {
-            .message-bubble {
-                max-width: 85%;
+            .sidebar {
+                position: fixed;
+                left: -300px;
+                top: 0;
+                bottom: 0;
+                z-index: 50;
+                transition: left 0.3s;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .back-btn {
+                display: block;
             }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/4.2.0/parse.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div id="authSection" class="auth-container">
-            <div class="auth-form">
-                <h1 style="background: linear-gradient(135deg, #a78bfa, #ec489a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 32px;">ShadowChat</h1>
-                <div id="errorMessage" class="error-message"></div>
-                <div id="successMessage" class="success-message"></div>
-                
-                <div id="loginForm">
-                    <div class="input-group">
-                        <label>Username</label>
-                        <input type="text" id="loginUsername" placeholder="Enter username">
-                    </div>
-                    <div class="input-group">
-                        <label>Password</label>
-                        <input type="password" id="loginPassword" placeholder="Enter password">
-                    </div>
-                    <button id="loginBtn">Sign In</button>
-                    <div class="switch-auth">
-                        No account? <a id="showRegisterLink">Create one</a>
-                    </div>
+    <!-- Auth Screen -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-box">
+            <h1>ShadowChat</h1>
+            <div id="authError" class="error-msg"></div>
+            <div id="authSuccess" class="success-msg"></div>
+            
+            <div id="loginPanel">
+                <div class="input-group">
+                    <input type="text" id="loginUsername" placeholder="Username">
                 </div>
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Password">
+                </div>
+                <button class="auth-btn" id="loginBtn">Sign In</button>
+                <div class="switch-auth">
+                    No account? <a id="showRegister">Create one</a>
+                </div>
+            </div>
 
-                <div id="registerForm" style="display:none;">
-                    <div class="input-group">
-                        <label>Username</label>
-                        <input type="text" id="registerUsername" placeholder="Choose username">
-                    </div>
-                    <div class="input-group">
-                        <label>Password</label>
-                        <input type="password" id="registerPassword" placeholder="Choose password">
-                    </div>
-                    <div class="input-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="confirmPassword" placeholder="Confirm password">
-                    </div>
-                    <button id="registerBtn">Create Account</button>
-                    <div class="switch-auth">
-                        Already have an account? <a id="showLoginLink">Sign in</a>
-                    </div>
+            <div id="registerPanel" style="display:none;">
+                <div class="input-group">
+                    <input type="text" id="regUsername" placeholder="Username">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="regPassword" placeholder="Password">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="regConfirm" placeholder="Confirm Password">
+                </div>
+                <button class="auth-btn" id="registerBtn">Create Account</button>
+                <div class="switch-auth">
+                    Already have an account? <a id="showLogin">Sign in</a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div id="appSection" class="app-container">
-            <div class="header">
+    <!-- Main App -->
+    <div id="mainApp" class="app-main">
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-header">
                 <div class="user-info">
-                    <span class="username-display" id="currentUsername"></span>
-                    <button id="logoutBtn" class="logout-btn">Exit</button>
+                    <span class="username-display" id="sidebarUsername"></span>
+                    <button class="logout-btn" id="sidebarLogout">Exit</button>
+                </div>
+                <button class="new-chat-btn" id="newChatBtn">+ New Private Chat</button>
+            </div>
+            <div class="chats-list" id="chatsList"></div>
+        </div>
+
+        <div class="main-chat">
+            <div class="chat-header">
+                <button class="back-btn" id="backBtn">← Back</button>
+                <div>
+                    <div class="chat-title" id="chatTitle">Select a chat</div>
+                    <div class="chat-subtitle" id="chatSubtitle"></div>
                 </div>
             </div>
             <div class="messages-container" id="messagesContainer">
-                <div class="empty-messages">No messages yet. Start the conversation!</div>
+                <div class="empty-messages" style="text-align:center; color:#6b7280; padding:60px;">Select a chat to start messaging</div>
             </div>
-            <div class="message-input-container">
+            <div class="message-input-container" id="inputContainer" style="display:none;">
                 <div class="input-buttons">
-                    <button id="imageUploadBtn" class="icon-btn">
+                    <button class="icon-btn" id="imageBtn">
                         <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
                             <circle cx="8.5" cy="8.5" r="2.5" />
                             <path d="M21 15l-5-4-3 3-4-4-5 5" />
                         </svg>
                     </button>
-                    <button id="micBtn" class="icon-btn">
+                    <button class="icon-btn" id="voiceBtn">
                         <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z" />
                             <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
@@ -570,235 +612,98 @@
         </div>
     </div>
 
-    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+    <input type="file" id="imageFile" accept="image/*" style="display:none;">
+    
+    <!-- New Chat Modal -->
+    <div id="newChatModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:white; margin-bottom:16px;">Start a Private Chat</h3>
+            <input type="text" id="userSearch" class="user-search" placeholder="Search users...">
+            <div id="userList" class="user-list"></div>
+            <button id="closeModalBtn" style="margin-top:16px; background:#3a3a3a; color:white; padding:10px; border:none; border-radius:12px; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Action Menu -->
     <div id="actionMenu" class="action-menu">
         <button id="editAction" class="action-menu-item">Edit</button>
-        <div class="action-menu-divider"></div>
+        <div style="height:1px; background:#3a3a3a; margin:4px 0;"></div>
         <button id="deleteAction" class="action-menu-item delete">Delete</button>
     </div>
+
+    <!-- Edit Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <h3 style="color: white; margin-bottom: 16px;">Edit Message</h3>
-            <textarea id="editText" rows="3"></textarea>
-            <div class="modal-buttons">
-                <button id="saveEditBtn">Save</button>
-                <button id="cancelEditBtn" style="background: #3a3a3a;">Cancel</button>
+            <h3 style="color:white;">Edit Message</h3>
+            <textarea id="editText" rows="3" style="width:100%; padding:12px; background:#2a2a2a; border:1px solid #3a3a3a; border-radius:12px; color:white; margin:16px 0;"></textarea>
+            <div style="display:flex; gap:12px;">
+                <button id="saveEditBtn" style="flex:1; background:#25D366; padding:10px; border:none; border-radius:12px; color:white;">Save</button>
+                <button id="cancelEditBtn" style="flex:1; background:#3a3a3a; padding:10px; border:none; border-radius:12px; color:white;">Cancel</button>
             </div>
         </div>
     </div>
-    <div id="imageModal" class="image-modal">
-        <img id="modalImage" src="">
-    </div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-                "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
-            }
-        }
-    </script>
-    
-    <script type="module">
-        // USING YOUR EXISTING FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyBJ8wf399dp0nxFYl8y7SoarcDUOiZ7Wow",
-            authDomain: "chatappv2-b6bd8.firebaseapp.com",
-            projectId: "chatappv2-b6bd8",
-            storageBucket: "chatappv2-b6bd8.firebasestorage.app",
-            messagingSenderId: "458480303979",
-            appId: "1:458480303979:web:a3a83ed05856d23df6d62e",
-            measurementId: "G-ZS3DQJS2HW"
-        };
+    <script>
+        // Initialize Parse with your Back4App credentials
+        Parse.initialize("af3nhQVRaFT5o5ZjYyQfztZZSMxCNT6VFhevLQvZ", "AjRAxMvX8gNQMIGHcJ0icjaIZRa8og37GF9wjDLU");
+        Parse.serverURL = 'https://parseapi.back4app.com/';
 
-        import { initializeApp } from "firebase/app";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, Timestamp, getDocs, where } from "firebase/firestore";
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // DOM elements
-        const authSection = document.getElementById('authSection');
-        const appSection = document.getElementById('appSection');
-        const currentUsernameSpan = document.getElementById('currentUsername');
-        const messagesContainer = document.getElementById('messagesContainer');
-        const messageInput = document.getElementById('messageInput');
-        const micBtn = document.getElementById('micBtn');
-        const errorDiv = document.getElementById('errorMessage');
-        const successDiv = document.getElementById('successMessage');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const loginUsername = document.getElementById('loginUsername');
-        const loginPassword = document.getElementById('loginPassword');
-        const registerUsername = document.getElementById('registerUsername');
-        const registerPassword = document.getElementById('registerPassword');
-        const confirmPassword = document.getElementById('confirmPassword');
-        const imageInput = document.getElementById('imageInput');
-        const actionMenu = document.getElementById('actionMenu');
-        const editModal = document.getElementById('editModal');
-        const editText = document.getElementById('editText');
-        const imageModal = document.getElementById('imageModal');
-        const modalImage = document.getElementById('modalImage');
-
-        let currentUserId = null;
-        let currentUsername = "";
-        let messages = [];
-        let messagesUnsubscribe = null;
+        let currentUser = null;
+        let currentChat = null;
+        let currentChatType = null;
+        let currentChatPartner = null;
+        let messagesSubscription = null;
+        let pressTimer = null;
+        let selectedMessage = null;
         let mediaRecorder = null;
         let audioChunks = [];
         let isRecording = false;
-        let selectedMessageId = null;
-        let currentAudio = null;
-        let pressTimer = null;
-        let editingMessageId = null;
 
+        // DOM Elements
+        const authScreen = document.getElementById('authScreen');
+        const mainApp = document.getElementById('mainApp');
+        const authError = document.getElementById('authError');
+        const authSuccess = document.getElementById('authSuccess');
+        const chatsList = document.getElementById('chatsList');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const inputContainer = document.getElementById('inputContainer');
+        const chatTitle = document.getElementById('chatTitle');
+        const chatSubtitle = document.getElementById('chatSubtitle');
+        const sidebarUsername = document.getElementById('sidebarUsername');
+        const actionMenu = document.getElementById('actionMenu');
+        const editModal = document.getElementById('editModal');
+        const editText = document.getElementById('editText');
+
+        // Helper functions
         function showError(msg) {
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
-            setTimeout(() => errorDiv.style.display = 'none', 3000);
+            authError.textContent = msg;
+            authError.style.display = 'block';
+            setTimeout(() => authError.style.display = 'none', 3000);
         }
 
         function showSuccess(msg) {
-            successDiv.textContent = msg;
-            successDiv.style.display = 'block';
-            setTimeout(() => successDiv.style.display = 'none', 3000);
+            authSuccess.textContent = msg;
+            authSuccess.style.display = 'block';
+            setTimeout(() => authSuccess.style.display = 'none', 3000);
         }
 
-        // Long press handlers
-        function startLongPress(messageId, event) {
-            pressTimer = setTimeout(() => {
-                const message = messages.find(m => m.id === messageId);
-                if (message && message.senderId === currentUserId) {
-                    selectedMessageId = messageId;
-                    let x = event.clientX || (event.touches ? event.touches[0].clientX : 0);
-                    let y = event.clientY || (event.touches ? event.touches[0].clientY : 0);
-                    actionMenu.style.display = 'flex';
-                    actionMenu.style.left = (x - 70) + 'px';
-                    actionMenu.style.top = (y - 60) + 'px';
-                    setTimeout(() => {
-                        document.addEventListener('click', closeActionMenu);
-                    }, 0);
-                }
-            }, 500);
+        function formatTime(date) {
+            const now = new Date();
+            const diff = now - date;
+            if (diff < 60000) return 'now';
+            if (diff < 3600000) return `${Math.floor(diff/60000)}m`;
+            if (diff < 86400000) return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            return date.toLocaleDateString();
         }
 
-        function cancelLongPress() {
-            if (pressTimer) clearTimeout(pressTimer);
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
-        function closeActionMenu() {
-            actionMenu.style.display = 'none';
-            selectedMessageId = null;
-            document.removeEventListener('click', closeActionMenu);
-        }
-
-        function editSelectedMessage() {
-            if (selectedMessageId) {
-                const message = messages.find(m => m.id === selectedMessageId);
-                if (message) {
-                    editingMessageId = selectedMessageId;
-                    editText.value = message.content;
-                    editModal.style.display = 'flex';
-                }
-                closeActionMenu();
-            }
-        }
-
-        async function deleteSelectedMessage() {
-            if (selectedMessageId) {
-                if (confirm("Delete this message?")) {
-                    await deleteDoc(doc(db, "messages", selectedMessageId));
-                }
-                closeActionMenu();
-            }
-        }
-
-        // Voice Recording
-        async function startVoiceRecording() {
-            if (isRecording) {
-                if (mediaRecorder) mediaRecorder.stop();
-                isRecording = false;
-                micBtn.classList.remove('active');
-                return;
-            }
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        addDoc(collection(db, "messages"), {
-                            senderId: currentUserId,
-                            senderName: currentUsername,
-                            type: "voice",
-                            content: reader.result,
-                            timestamp: Timestamp.now(),
-                            edited: false
-                        });
-                    };
-                    reader.readAsDataURL(audioBlob);
-                    stream.getTracks().forEach(track => track.stop());
-                };
-                mediaRecorder.start();
-                isRecording = true;
-                micBtn.classList.add('active');
-                showSuccess("Recording... Tap again to stop");
-                setTimeout(() => {
-                    if (isRecording && mediaRecorder) mediaRecorder.stop();
-                    isRecording = false;
-                    micBtn.classList.remove('active');
-                }, 60000);
-            } catch (err) {
-                showError("Microphone access denied");
-            }
-        }
-
-        // Image Upload
-        function handleImageUpload(input) {
-            const file = input.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    addDoc(collection(db, "messages"), {
-                        senderId: currentUserId,
-                        senderName: currentUsername,
-                        type: "image",
-                        content: e.target.result,
-                        timestamp: Timestamp.now(),
-                        edited: false
-                    });
-                };
-                reader.readAsDataURL(file);
-            }
-            input.value = '';
-        }
-
-        // Play Voice
-        function playVoice(audioData, btnElement) {
-            if (currentAudio && !currentAudio.paused) {
-                currentAudio.pause();
-                currentAudio = null;
-                btnElement.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3" /></svg>`;
-                return;
-            }
-            const audio = new Audio(audioData);
-            currentAudio = audio;
-            btnElement.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>`;
-            audio.play();
-            audio.onended = () => {
-                currentAudio = null;
-                btnElement.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3" /></svg>`;
-            };
-        }
-
-        // Detect and embed links
-        function detectAndEmbedLinks(text) {
+        function detectLinks(text) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             const urls = text.match(urlRegex);
             if (!urls) return { text, embeds: [] };
@@ -823,268 +728,429 @@
             return { text: processedText.trim(), embeds };
         }
 
-        // Send text message
-        async function sendMessage() {
-            if (!currentUserId) return;
-            const content = messageInput.value.trim();
-            if (!content) return;
-            const { text, embeds } = detectAndEmbedLinks(content);
-            await addDoc(collection(db, "messages"), {
-                senderId: currentUserId,
-                senderName: currentUsername,
-                type: "text",
-                content: text,
-                embeds: embeds,
-                timestamp: Timestamp.now(),
-                edited: false
+        // Load chats
+        async function loadChats() {
+            if (!currentUser) return;
+            
+            const PublicChat = Parse.Object.extend("PublicChat");
+            const query = new Parse.Query(PublicChat);
+            query.equalTo("participants", currentUser.id);
+            const publicChats = await query.find();
+            
+            const PrivateChat = Parse.Object.extend("PrivateChat");
+            const privateQuery = new Parse.Query(PrivateChat);
+            privateQuery.contains("participants", currentUser.id);
+            const privateChats = await privateQuery.find();
+            
+            chatsList.innerHTML = '';
+            
+            // Public Chat
+            const publicDiv = document.createElement('div');
+            publicDiv.className = `chat-item ${currentChat === 'public' ? 'active' : ''}`;
+            publicDiv.innerHTML = `
+                <div class="chat-name">🌐 Public Chat</div>
+                <div class="chat-type">Everyone can see</div>
+            `;
+            publicDiv.onclick = () => openChat('public', null, 'Public Chat');
+            chatsList.appendChild(publicDiv);
+            
+            // Private Chats
+            for (const chat of privateChats) {
+                const participants = chat.get('participants');
+                const otherId = participants.find(p => p !== currentUser.id);
+                const otherUser = await new Parse.Query(Parse.User).get(otherId);
+                const chatName = otherUser.get('username');
+                const div = document.createElement('div');
+                div.className = `chat-item ${currentChat === chat.id ? 'active' : ''}`;
+                div.innerHTML = `
+                    <div class="chat-name">🔒 ${escapeHtml(chatName)}</div>
+                    <div class="chat-type">Private chat</div>
+                `;
+                div.onclick = () => openChat('private', chat.id, chatName);
+                chatsList.appendChild(div);
+            }
+        }
+
+        // Open a chat
+        async function openChat(type, chatId, title) {
+            if (messagesSubscription) {
+                messagesSubscription.unsubscribe();
+            }
+            
+            currentChat = chatId || type;
+            currentChatType = type;
+            chatTitle.textContent = title;
+            chatSubtitle.textContent = type === 'public' ? 'Public chat - everyone can see' : 'Private conversation';
+            inputContainer.style.display = 'flex';
+            
+            // Load messages
+            const Message = Parse.Object.extend("Message");
+            const query = new Parse.Query(Message);
+            
+            if (type === 'public') {
+                query.equalTo("chatType", "public");
+                query.equalTo("chatId", "public");
+            } else {
+                query.equalTo("chatType", "private");
+                query.equalTo("chatId", chatId);
+            }
+            
+            query.descending("createdAt");
+            query.limit(100);
+            const results = await query.find();
+            
+            messagesContainer.innerHTML = '';
+            const messagesList = results.reverse();
+            
+            for (const msg of messagesList) {
+                appendMessage(msg);
+            }
+            
+            // Subscribe to new messages
+            const subscription = await query.subscribe();
+            subscription.on('create', (msg) => {
+                appendMessage(msg);
             });
+            messagesSubscription = subscription;
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Append a single message
+        function appendMessage(msg) {
+            const isSent = msg.get('senderId') === currentUser.id;
+            const senderName = msg.get('senderName');
+            const content = msg.get('content');
+            const messageType = msg.get('type') || 'text';
+            const timestamp = msg.get('createdAt');
+            const isEdited = msg.get('edited') || false;
+            const messageId = msg.id;
+            
+            const { text, embeds } = detectLinks(content);
+            
+            let contentHtml = `<div class="message-content">${escapeHtml(text)}</div>`;
+            
+            if (embeds && embeds.length > 0) {
+                embeds.forEach(embed => {
+                    if (embed.type === 'youtube') {
+                        contentHtml += `
+                            <div class="link-embed">
+                                <div class="embed-video">
+                                    <iframe src="${embed.url}" frameborder="0" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        `;
+                    } else if (embed.type === 'link') {
+                        contentHtml += `
+                            <a href="${embed.url}" target="_blank" class="link-embed embed-link">
+                                <div class="embed-url">${escapeHtml(embed.url)}</div>
+                                <div class="embed-title">Open Link →</div>
+                            </a>
+                        `;
+                    }
+                });
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+            messageDiv.onclick = (e) => {
+                e.stopPropagation();
+                if (isSent) {
+                    showActionMenu(messageId, content, e);
+                } else if (currentChatType === 'public') {
+                    startPrivateChat(senderName);
+                }
+            };
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    <span class="message-sender">${escapeHtml(senderName)}</span>
+                    ${contentHtml}
+                    <span class="message-time">${formatTime(timestamp)}${isEdited ? '<span class="edited-indicator"> edited</span>' : ''}</span>
+                </div>
+            `;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Send message
+        async function sendMessage() {
+            const content = messageInput.value.trim();
+            if (!content || !currentChat) return;
+            
+            const Message = Parse.Object.extend("Message");
+            const newMessage = new Message();
+            newMessage.set("senderId", currentUser.id);
+            newMessage.set("senderName", currentUser.get('username'));
+            newMessage.set("content", content);
+            newMessage.set("type", "text");
+            newMessage.set("edited", false);
+            
+            if (currentChatType === 'public') {
+                newMessage.set("chatType", "public");
+                newMessage.set("chatId", "public");
+            } else {
+                newMessage.set("chatType", "private");
+                newMessage.set("chatId", currentChat);
+            }
+            
+            await newMessage.save();
             messageInput.value = '';
             messageInput.style.height = 'auto';
         }
 
-        // Save edited message
-        async function saveEdit() {
-            const newContent = editText.value.trim();
-            if (newContent && editingMessageId) {
-                const msgRef = doc(db, "messages", editingMessageId);
-                await updateDoc(msgRef, {
-                    content: newContent,
-                    edited: true,
-                    editedAt: Timestamp.now()
-                });
-            }
-            editModal.style.display = 'none';
-            editingMessageId = null;
+        // Edit message
+        async function editMessage(messageId, newContent) {
+            const query = new Parse.Query("Message");
+            const msg = await query.get(messageId);
+            msg.set("content", newContent);
+            msg.set("edited", true);
+            await msg.save();
         }
 
-        // View Image
-        function viewImage(imageData) {
-            modalImage.src = imageData;
-            imageModal.style.display = 'flex';
+        // Delete message
+        async function deleteMessage(messageId) {
+            const query = new Parse.Query("Message");
+            const msg = await query.get(messageId);
+            await msg.destroy();
         }
 
-        function closeImageModal() {
-            imageModal.style.display = 'none';
+        // Show action menu
+        function showActionMenu(messageId, content, event) {
+            selectedMessage = { id: messageId, content };
+            let x = event.clientX || (event.touches ? event.touches[0].clientX : 0);
+            let y = event.clientY || (event.touches ? event.touches[0].clientY : 0);
+            actionMenu.style.display = 'flex';
+            actionMenu.style.left = (x - 70) + 'px';
+            actionMenu.style.top = (y - 60) + 'px';
         }
 
-        // Render messages
-        function renderMessages() {
-            if (!messagesContainer) return;
-            if (!messages.length) {
-                messagesContainer.innerHTML = '<div class="empty-messages">No messages yet. Start the conversation!</div>';
+        function closeActionMenu() {
+            actionMenu.style.display = 'none';
+            selectedMessage = null;
+        }
+
+        // Start private chat
+        async function startPrivateChat(username) {
+            if (username === currentUser.get('username')) {
+                showError("You can't chat with yourself");
                 return;
             }
-            const sorted = [...messages].sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
-            messagesContainer.innerHTML = sorted.map(msg => {
-                const isSent = msg.senderId === currentUserId;
-                let contentHtml = '';
-                if (msg.type === 'image') {
-                    contentHtml = `<img src="${msg.content}" class="message-image" onclick="window.viewImageExternal('${msg.content}')" style="pointer-events: auto;">`;
-                } else if (msg.type === 'voice') {
-                    contentHtml = `
-                        <div class="voice-message">
-                            <button class="play-btn" onclick="window.playVoiceExternal('${msg.content}', this)" style="pointer-events: auto;">
-                                <svg viewBox="0 0 24 24" fill="white" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3" /></svg>
-                            </button>
-                            <span class="voice-duration">Voice note</span>
-                        </div>
-                    `;
-                } else {
-                    let textContent = escapeHtml(msg.content);
-                    if (textContent === '') textContent = ' ';
-                    contentHtml = `<div class="message-content">${textContent}</div>`;
-                    if (msg.embeds && msg.embeds.length > 0) {
-                        msg.embeds.forEach(embed => {
-                            if (embed.type === 'youtube') {
-                                contentHtml += `
-                                    <div class="link-embed">
-                                        <div class="embed-video">
-                                            <iframe src="${embed.url}" frameborder="0" allowfullscreen></iframe>
-                                        </div>
-                                    </div>
-                                `;
-                            } else if (embed.type === 'link') {
-                                contentHtml += `
-                                    <a href="${embed.url}" target="_blank" class="link-embed embed-link" style="pointer-events: auto;">
-                                        <div class="embed-info">
-                                            <div class="embed-url">${escapeHtml(embed.url)}</div>
-                                            <div class="embed-title">Open Link</div>
-                                        </div>
-                                    </a>
-                                `;
-                            }
-                        });
+            
+            const userQuery = new Parse.Query(Parse.User);
+            userQuery.equalTo("username", username);
+            const otherUser = await userQuery.first();
+            
+            if (!otherUser) return;
+            
+            const PrivateChat = Parse.Object.extend("PrivateChat");
+            const query = new Parse.Query(PrivateChat);
+            query.contains("participants", currentUser.id);
+            query.contains("participants", otherUser.id);
+            const existing = await query.first();
+            
+            if (existing) {
+                openChat('private', existing.id, username);
+            } else {
+                const newChat = new PrivateChat();
+                newChat.set("participants", [currentUser.id, otherUser.id]);
+                await newChat.save();
+                openChat('private', newChat.id, username);
+            }
+            loadChats();
+            document.getElementById('newChatModal').style.display = 'none';
+        }
+
+        // Load users for new chat
+        async function loadUsers(searchTerm) {
+            const query = new Parse.Query(Parse.User);
+            query.notEqualTo("objectId", currentUser.id);
+            if (searchTerm) {
+                query.startsWith("username", searchTerm);
+            }
+            query.limit(20);
+            const users = await query.find();
+            
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            for (const user of users) {
+                const div = document.createElement('div');
+                div.className = 'user-item';
+                div.textContent = user.get('username');
+                div.onclick = () => startPrivateChat(user.get('username'));
+                userList.appendChild(div);
+            }
+        }
+
+        // Voice recording
+        async function startVoiceRecording() {
+            if (isRecording) {
+                if (mediaRecorder) mediaRecorder.stop();
+                isRecording = false;
+                document.getElementById('voiceBtn').classList.remove('active');
+                return;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.onloadend = async () => {
+                        const Message = Parse.Object.extend("Message");
+                        const newMessage = new Message();
+                        newMessage.set("senderId", currentUser.id);
+                        newMessage.set("senderName", currentUser.get('username'));
+                        newMessage.set("content", reader.result);
+                        newMessage.set("type", "voice");
+                        newMessage.set("edited", false);
+                        
+                        if (currentChatType === 'public') {
+                            newMessage.set("chatType", "public");
+                            newMessage.set("chatId", "public");
+                        } else {
+                            newMessage.set("chatType", "private");
+                            newMessage.set("chatId", currentChat);
+                        }
+                        await newMessage.save();
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    reader.readAsDataURL(audioBlob);
+                };
+                mediaRecorder.start();
+                isRecording = true;
+                document.getElementById('voiceBtn').classList.add('active');
+                setTimeout(() => {
+                    if (isRecording) startVoiceRecording();
+                }, 60000);
+            } catch (err) {
+                showError("Microphone access denied");
+            }
+        }
+
+        // Image upload
+        function handleImageUpload(file) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const Message = Parse.Object.extend("Message");
+                    const newMessage = new Message();
+                    newMessage.set("senderId", currentUser.id);
+                    newMessage.set("senderName", currentUser.get('username'));
+                    newMessage.set("content", e.target.result);
+                    newMessage.set("type", "image");
+                    newMessage.set("edited", false);
+                    
+                    if (currentChatType === 'public') {
+                        newMessage.set("chatType", "public");
+                        newMessage.set("chatId", "public");
+                    } else {
+                        newMessage.set("chatType", "private");
+                        newMessage.set("chatId", currentChat);
                     }
-                }
-                const editedHtml = msg.edited ? '<span class="edited-indicator">edited</span>' : '';
-                return `
-                    <div class="message ${isSent ? 'sent' : 'received'}"
-                         onmousedown="window.startLongPressExternal('${msg.id}', event)"
-                         ontouchstart="window.startLongPressExternal('${msg.id}', event)"
-                         onmouseup="window.cancelLongPressExternal()"
-                         ontouchend="window.cancelLongPressExternal()"
-                         onmouseleave="window.cancelLongPressExternal()">
-                        <div class="message-bubble">
-                            <span class="message-sender">${escapeHtml(msg.senderName)}</span>
-                            ${contentHtml}
-                            <span class="message-time">${formatTime(msg.timestamp)}${editedHtml}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function formatTime(ts) {
-            const date = new Date(ts);
-            const now = new Date();
-            const diff = now - date;
-            if (diff < 60000) return 'now';
-            if (diff < 3600000) return `${Math.floor(diff/60000)}m`;
-            if (diff < 86400000) return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            return date.toLocaleDateString([], {month:'short', day:'numeric'});
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Real-time listener
-        function loadMessagesRealtime() {
-            if (messagesUnsubscribe) messagesUnsubscribe();
-            const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
-            messagesUnsubscribe = onSnapshot(q, (snapshot) => {
-                messages = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const timestamp = data.timestamp?.toDate() || new Date();
-                    messages.push({
-                        id: doc.id,
-                        ...data,
-                        timestamp: timestamp.toISOString()
-                    });
-                });
-                renderMessages();
-            });
+                    await newMessage.save();
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
         // Auth functions
         async function register() {
-            const username = registerUsername.value.trim();
-            const password = registerPassword.value;
-            const confirm = confirmPassword.value;
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirm').value;
+            
             if (!username || !password) return showError('Fill all fields');
             if (password !== confirm) return showError('Passwords do not match');
             if (username.length < 3) return showError('Username must be at least 3 characters');
-            if (password.length < 4) return showError('Password must be at least 4 characters');
             
-            const usersRef = collection(db, "users");
-            const q = query(usersRef, where("username", "==", username));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) return showError("Username already taken");
-            
-            const email = `${username}@shadowchat.local`;
             try {
-                const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                await addDoc(collection(db, "users"), {
-                    uid: userCred.user.uid,
-                    username: username,
-                    email: email
-                });
-                showSuccess('Account created! You are now logged in.');
-                registerUsername.value = '';
-                registerPassword.value = '';
-                confirmPassword.value = '';
+                const user = new Parse.User();
+                user.set("username", username);
+                user.set("password", password);
+                await user.signUp();
+                showSuccess('Account created! Logging in...');
+                setTimeout(() => login(username, password), 1500);
             } catch (err) {
                 showError(err.message);
             }
         }
 
-        async function login() {
-            const username = loginUsername.value.trim();
-            const password = loginPassword.value;
-            if (!username || !password) return showError('Enter username and password');
-            
-            const usersRef = collection(db, "users");
-            const q = query(usersRef, where("username", "==", username));
-            const querySnapshot = await getDocs(q);
-            if (querySnapshot.empty) return showError("User not found");
-            
-            const userDoc = querySnapshot.docs[0];
-            const email = userDoc.data().email;
+        async function login(username, password) {
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                loginUsername.value = '';
-                loginPassword.value = '';
+                const user = await Parse.User.logIn(username, password);
+                currentUser = user;
+                sidebarUsername.textContent = user.get('username');
+                authScreen.style.display = 'none';
+                mainApp.style.display = 'flex';
+                await loadChats();
+                openChat('public', null, 'Public Chat');
             } catch (err) {
-                showError("Invalid password");
+                showError('Invalid username or password');
             }
         }
 
         async function logout() {
-            await signOut(auth);
+            await Parse.User.logOut();
+            currentUser = null;
+            authScreen.style.display = 'flex';
+            mainApp.style.display = 'none';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
         }
 
-        // Auth state listener
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUserId = user.uid;
-                const usersRef = collection(db, "users");
-                const q = query(usersRef, where("uid", "==", user.uid));
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot.empty) {
-                    currentUsername = querySnapshot.docs[0].data().username;
-                } else {
-                    currentUsername = user.email.split('@')[0];
-                }
-                authSection.style.display = 'none';
-                appSection.style.display = 'flex';
-                currentUsernameSpan.textContent = currentUsername;
-                loadMessagesRealtime();
-            } else {
-                if (messagesUnsubscribe) messagesUnsubscribe();
-                authSection.style.display = 'flex';
-                appSection.style.display = 'none';
-                currentUserId = null;
-                currentUsername = "";
-                messages = [];
-                if (currentAudio) currentAudio.pause();
+        // Event Listeners
+        document.getElementById('loginBtn').onclick = () => {
+            login(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value);
+        };
+        document.getElementById('registerBtn').onclick = register;
+        document.getElementById('sidebarLogout').onclick = logout;
+        document.getElementById('sendBtn').onclick = sendMessage;
+        document.getElementById('showRegister').onclick = () => {
+            document.getElementById('loginPanel').style.display = 'none';
+            document.getElementById('registerPanel').style.display = 'block';
+        };
+        document.getElementById('showLogin').onclick = () => {
+            document.getElementById('loginPanel').style.display = 'block';
+            document.getElementById('registerPanel').style.display = 'none';
+        };
+        document.getElementById('imageBtn').onclick = () => document.getElementById('imageFile').click();
+        document.getElementById('voiceBtn').onclick = startVoiceRecording;
+        document.getElementById('imageFile').onchange = (e) => handleImageUpload(e.target.files[0]);
+        document.getElementById('newChatBtn').onclick = async () => {
+            await loadUsers('');
+            document.getElementById('newChatModal').style.display = 'flex';
+        };
+        document.getElementById('userSearch').oninput = (e) => loadUsers(e.target.value);
+        document.getElementById('closeModalBtn').onclick = () => document.getElementById('newChatModal').style.display = 'none';
+        document.getElementById('backBtn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+        
+        // Edit/Delete actions
+        document.getElementById('editAction').onclick = () => {
+            if (selectedMessage) {
+                editText.value = selectedMessage.content;
+                editModal.style.display = 'flex';
+                closeActionMenu();
             }
-        });
-
-        // Attach event listeners
-        document.getElementById('loginBtn').addEventListener('click', login);
-        document.getElementById('registerBtn').addEventListener('click', register);
-        document.getElementById('logoutBtn').addEventListener('click', logout);
-        document.getElementById('showRegisterLink').addEventListener('click', () => {
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-        });
-        document.getElementById('showLoginLink').addEventListener('click', () => {
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
-        });
-        document.getElementById('imageUploadBtn').addEventListener('click', () => imageInput.click());
-        imageInput.addEventListener('change', () => handleImageUpload(imageInput));
-        document.getElementById('micBtn').addEventListener('click', startVoiceRecording);
-        document.getElementById('sendBtn').addEventListener('click', sendMessage);
-        document.getElementById('editAction').addEventListener('click', editSelectedMessage);
-        document.getElementById('deleteAction').addEventListener('click', deleteSelectedMessage);
-        document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
-        document.getElementById('cancelEditBtn').addEventListener('click', () => {
-            editModal.style.display = 'none';
-            editingMessageId = null;
-        });
-        imageModal.addEventListener('click', closeImageModal);
-
-        // Expose external functions
-        window.startLongPressExternal = startLongPress;
-        window.cancelLongPressExternal = cancelLongPress;
-        window.viewImageExternal = viewImage;
-        window.playVoiceExternal = playVoice;
-
+        };
+        document.getElementById('deleteAction').onclick = async () => {
+            if (selectedMessage && confirm('Delete this message?')) {
+                await deleteMessage(selectedMessage.id);
+                closeActionMenu();
+                window.location.reload();
+            }
+        };
+        document.getElementById('saveEditBtn').onclick = async () => {
+            const newContent = editText.value.trim();
+            if (newContent && selectedMessage) {
+                await editMessage(selectedMessage.id, newContent);
+                editModal.style.display = 'none';
+                window.location.reload();
+            }
+        };
+        document.getElementById('cancelEditBtn').onclick = () => editModal.style.display = 'none';
+        
         // Auto-resize textarea
         messageInput.addEventListener('input', function() {
             this.style.height = 'auto';
@@ -1096,6 +1162,20 @@
                 sendMessage();
             }
         });
+        
+        document.addEventListener('click', (e) => {
+            if (!actionMenu.contains(e.target)) closeActionMenu();
+        });
+        
+        // Check for existing session
+        if (Parse.User.current()) {
+            currentUser = Parse.User.current();
+            sidebarUsername.textContent = currentUser.get('username');
+            authScreen.style.display = 'none';
+            mainApp.style.display = 'flex';
+            loadChats();
+            openChat('public', null, 'Public Chat');
+        }
     </script>
 </body>
 </html>
