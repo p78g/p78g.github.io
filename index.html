@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>ShadowChat</title>
     <style>
-        /* --- All existing styles from the previous version (unchanged) --- */
         * {
             margin: 0;
             padding: 0;
@@ -35,7 +34,6 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        /* Auth Forms */
         .auth-container {
             padding: 40px;
             background: #1a1a1a;
@@ -145,7 +143,6 @@
             border: 1px solid rgba(74, 222, 128, 0.2);
         }
 
-        /* Notification Banner */
         .notification-banner {
             background: rgba(37, 211, 102, 0.1);
             border: 1px solid rgba(37, 211, 102, 0.3);
@@ -178,7 +175,6 @@
             width: auto;
         }
 
-        /* Main App */
         .app-container {
             display: none;
             flex-direction: column;
@@ -216,7 +212,6 @@
             width: auto;
         }
 
-        /* Messages Container */
         .messages-container {
             flex: 1;
             overflow-y: auto;
@@ -226,7 +221,6 @@
             flex-direction: column;
         }
 
-        /* Message Bubbles - Long press for menu */
         .message {
             display: flex;
             margin-bottom: 12px;
@@ -286,7 +280,6 @@
             word-break: break-word;
         }
 
-        /* Link Embed Styling */
         .link-embed {
             margin-top: 8px;
             border-radius: 12px;
@@ -329,7 +322,6 @@
             font-size: 0.85em;
         }
 
-        /* Image Styling */
         .message-image {
             max-width: 100%;
             max-height: 300px;
@@ -339,7 +331,6 @@
             pointer-events: auto;
         }
 
-        /* Voice Message Styling - SVG Play/Pause */
         .voice-message {
             display: flex;
             align-items: center;
@@ -371,15 +362,6 @@
             background: rgba(0, 0, 0, 0.2);
         }
 
-        .play-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        .voice-duration {
-            font-size: 0.8em;
-            color: #9ca3af;
-        }
-
         .edited-indicator {
             font-size: 0.7em;
             font-weight: 500;
@@ -399,7 +381,6 @@
             opacity: 0.7;
         }
 
-        /* Action Menu Popup */
         .action-menu {
             position: fixed;
             background: #2a2a2a;
@@ -441,15 +422,10 @@
 
         .action-menu-item:hover {
             background: #3a3a3a;
-            transform: none;
         }
 
         .action-menu-item.delete {
             color: #f87171;
-        }
-
-        .action-menu-item.delete:hover {
-            background: rgba(248, 113, 113, 0.15);
         }
 
         .action-menu-divider {
@@ -469,7 +445,6 @@
             }
         }
 
-        /* Input Area */
         .message-input-container {
             padding: 16px 20px;
             background: #1a1a1a;
@@ -549,7 +524,6 @@
             padding: 60px 20px;
         }
 
-        /* Modal for editing */
         .modal {
             display: none;
             position: fixed;
@@ -598,7 +572,6 @@
             padding: 10px 20px;
         }
 
-        /* Image Modal */
         .image-modal {
             display: none;
             position: fixed;
@@ -629,7 +602,110 @@
             }
         }
     </style>
-    <!-- Firebase SDK -->
+</head>
+<body>
+    <div class="container">
+        <div id="authSection" class="auth-container">
+            <div class="auth-form">
+                <h1 class="visually-hidden">ShadowChat</h1>
+                <div id="notificationBanner" class="notification-banner" style="display: none;">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                    <span>Enable notifications</span>
+                    <button onclick="requestNotificationPermission()" class="enable-notif-btn">Enable</button>
+                </div>
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
+                
+                <div id="loginForm">
+                    <div class="input-group">
+                        <label>Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter username">
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter password">
+                    </div>
+                    <button onclick="login()">Sign In</button>
+                    <div class="switch-auth">
+                        No account? <a onclick="showRegister()">Create one</a>
+                    </div>
+                </div>
+
+                <div id="registerForm" style="display:none;">
+                    <div class="input-group">
+                        <label>Username</label>
+                        <input type="text" id="registerUsername" placeholder="Choose username">
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" placeholder="Choose password">
+                    </div>
+                    <div class="input-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm password">
+                    </div>
+                    <button onclick="register()">Create Account</button>
+                    <div class="switch-auth">
+                        Already have an account? <a onclick="showLogin()">Sign in</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="appSection" class="app-container">
+            <div class="header">
+                <div class="user-info">
+                    <span class="username-display" id="currentUsername"></span>
+                    <button onclick="logout()" class="logout-btn">Exit</button>
+                </div>
+            </div>
+            <div class="messages-container" id="messagesContainer"></div>
+            <div class="message-input-container">
+                <div class="input-buttons">
+                    <button class="icon-btn" onclick="document.getElementById('imageInput').click()">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+                            <circle cx="8.5" cy="8.5" r="2.5" />
+                            <path d="M21 15l-5-4-3 3-4-4-5 5" />
+                        </svg>
+                    </button>
+                    <button class="icon-btn" id="micBtn" onclick="startVoiceRecording()">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z" />
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                            <line x1="12" y1="19" x2="12" y2="22" />
+                        </svg>
+                    </button>
+                </div>
+                <textarea class="message-input" id="messageInput" rows="1" placeholder="Type a message..."></textarea>
+                <button onclick="sendMessage()" class="send-btn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
+    <div id="actionMenu" class="action-menu">
+        <button class="action-menu-item" id="editAction">Edit</button>
+        <div class="action-menu-divider"></div>
+        <button class="action-menu-item delete" id="deleteAction">Delete</button>
+    </div>
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Message</h3>
+            <textarea id="editText" rows="3"></textarea>
+            <div class="modal-buttons">
+                <button onclick="saveEdit()">Save</button>
+                <button onclick="closeEditModal()" style="background: #3a3a3a;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <img id="modalImage" src="">
+    </div>
+
     <script type="importmap">
         {
             "imports": {
@@ -639,12 +715,12 @@
             }
         }
     </script>
+    
     <script type="module">
         import { initializeApp } from "firebase/app";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, Timestamp, getDocs, where } from "firebase/firestore";
 
-        // Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyBJ8wf399dp0nxFYl8y7SoarcDUOiZ7Wow",
             authDomain: "chatappv2-b6bd8.firebaseapp.com",
@@ -660,7 +736,7 @@
         const db = getFirestore(app);
 
         // Global variables
-        let currentUser = null;
+        let currentUserObj = null;
         let currentUserId = null;
         let currentUsername = "";
         let messages = [];
@@ -671,6 +747,7 @@
         let selectedMessageId = null;
         let currentAudio = null;
         let pressTimer = null;
+        let editingMessageId = null;
 
         // DOM elements
         const authSection = document.getElementById('authSection');
@@ -684,13 +761,7 @@
         const successDiv = document.getElementById('successMessage');
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
-        const loginUsername = document.getElementById('loginUsername');
-        const loginPassword = document.getElementById('loginPassword');
-        const registerUsername = document.getElementById('registerUsername');
-        const registerPassword = document.getElementById('registerPassword');
-        const confirmPassword = document.getElementById('confirmPassword');
 
-        // Helper functions
         function showError(msg) {
             errorDiv.textContent = msg;
             errorDiv.style.display = 'block';
@@ -703,7 +774,6 @@
             setTimeout(() => successDiv.style.display = 'none', 3000);
         }
 
-        // Notifications
         window.requestNotificationPermission = function() {
             if (!("Notification" in window)) return;
             Notification.requestPermission().then(permission => {
@@ -715,7 +785,6 @@
             });
         };
 
-        // Long press handlers (same as before)
         function startLongPress(messageId, event) {
             const target = event.target;
             if (target.closest('.embed-video iframe') || 
@@ -779,7 +848,6 @@
             }
         }
 
-        // Voice Recording
         window.startVoiceRecording = async function() {
             if (isRecording) {
                 stopVoiceRecording();
@@ -827,7 +895,6 @@
             });
         }
 
-        // Image Upload
         window.handleImageUpload = function(input) {
             const file = input.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -850,7 +917,6 @@
             });
         }
 
-        // Play Voice
         window.playVoice = function(audioData, btnElement) {
             if (currentAudio && !currentAudio.paused) {
                 currentAudio.pause();
@@ -881,7 +947,6 @@
             }
         }
 
-        // Detect and embed links
         function detectAndEmbedLinks(text) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             const urls = text.match(urlRegex);
@@ -911,11 +976,10 @@
             return { text: processedText.trim(), embeds };
         }
 
-        // Edit Message
         window.editMessage = async function(id) {
             const message = messages.find(m => m.id === id);
             if (message && message.senderId === currentUserId) {
-                window.editingMessageId = id;
+                editingMessageId = id;
                 document.getElementById('editText').value = message.content;
                 document.getElementById('editModal').style.display = 'flex';
             }
@@ -923,8 +987,8 @@
 
         window.saveEdit = async function() {
             const newContent = document.getElementById('editText').value.trim();
-            if (newContent && window.editingMessageId) {
-                const msgRef = doc(db, "messages", window.editingMessageId);
+            if (newContent && editingMessageId) {
+                const msgRef = doc(db, "messages", editingMessageId);
                 await updateDoc(msgRef, {
                     content: newContent,
                     edited: true,
@@ -936,16 +1000,14 @@
 
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
-            window.editingMessageId = null;
+            editingMessageId = null;
         }
 
-        // Delete Message
         window.deleteMessage = async function(id) {
             const msgRef = doc(db, "messages", id);
             await deleteDoc(msgRef);
         };
 
-        // View Image
         window.viewImage = function(imageData) {
             document.getElementById('modalImage').src = imageData;
             document.getElementById('imageModal').style.display = 'flex';
@@ -955,7 +1017,6 @@
             document.getElementById('imageModal').style.display = 'none';
         };
 
-        // Send text message
         window.sendMessage = async function() {
             const content = messageInput.value.trim();
             if (!content) return;
@@ -973,7 +1034,6 @@
             messageInput.style.height = 'auto';
         };
 
-        // Load messages in real-time
         function loadMessagesRealtime() {
             if (messagesUnsubscribe) messagesUnsubscribe();
             const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
@@ -1077,7 +1137,6 @@
             return div.innerHTML;
         }
 
-        // Auth UI functions (using only username + password)
         window.showRegister = function() {
             loginForm.style.display = 'none';
             registerForm.style.display = 'block';
@@ -1093,43 +1152,41 @@
         };
 
         window.register = async function() {
-            const username = registerUsername.value.trim();
-            const password = registerPassword.value;
-            const confirm = confirmPassword.value;
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
             if (!username || !password) return showError('Fill all fields');
             if (password !== confirm) return showError('Passwords do not match');
-            // Check if username already exists in Firestore
+            
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("username", "==", username));
             const querySnapshot = await getDocs(q);
             if (!querySnapshot.empty) {
                 return showError("Username already taken");
             }
-            // Create Firebase Auth account with generated email
+            
             const email = `${username}@shadowchat.local`;
             try {
                 const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                // Store username in Firestore
                 await addDoc(collection(db, "users"), {
                     uid: userCred.user.uid,
                     username: username,
                     email: email
                 });
                 showSuccess('Account created! You are now logged in.');
-                // Auth state will trigger app display
-                registerUsername.value = '';
-                registerPassword.value = '';
-                confirmPassword.value = '';
+                document.getElementById('registerUsername').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
             } catch (err) {
                 showError(err.message);
             }
         };
 
         window.login = async function() {
-            const username = loginUsername.value.trim();
-            const password = loginPassword.value;
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
             if (!username || !password) return showError('Enter username and password');
-            // Find the user in Firestore by username
+            
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("username", "==", username));
             const querySnapshot = await getDocs(q);
@@ -1140,9 +1197,8 @@
             const email = userDoc.data().email;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                // Auth state will handle UI
-                loginUsername.value = '';
-                loginPassword.value = '';
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
             } catch (err) {
                 showError("Invalid password");
             }
@@ -1152,11 +1208,9 @@
             await signOut(auth);
         };
 
-        // Auth state listener
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserId = user.uid;
-                // Fetch username from Firestore
                 const usersRef = collection(db, "users");
                 const q = query(usersRef, where("uid", "==", user.uid));
                 const querySnapshot = await getDocs(q);
@@ -1165,7 +1219,7 @@
                 } else {
                     currentUsername = user.email.split('@')[0];
                 }
-                currentUser = user;
+                currentUserObj = user;
                 authSection.style.display = 'none';
                 appSection.style.display = 'flex';
                 currentUsernameSpan.textContent = currentUsername;
@@ -1174,7 +1228,7 @@
                 if (messagesUnsubscribe) messagesUnsubscribe();
                 authSection.style.display = 'flex';
                 appSection.style.display = 'none';
-                currentUser = null;
+                currentUserObj = null;
                 currentUserId = null;
                 currentUsername = "";
                 messages = [];
@@ -1182,7 +1236,6 @@
             }
         });
 
-        // Auto-resize textarea
         if (messageInput) {
             messageInput.addEventListener('input', function() {
                 this.style.height = 'auto';
@@ -1196,132 +1249,18 @@
             });
         }
 
-        // Setup action menu buttons
         document.getElementById('editAction').onclick = editSelectedMessage;
         document.getElementById('deleteAction').onclick = deleteSelectedMessage;
 
-        // Notification permission banner
         if (Notification.permission === "default") {
             notificationBanner.style.display = 'flex';
         } else if (Notification.permission === "granted") {
             notificationBanner.style.display = 'none';
         }
 
-        // Expose functions needed for inline event handlers
         window.startLongPress = startLongPress;
         window.cancelLongPress = cancelLongPress;
         window.closeEditModal = closeEditModal;
     </script>
-</head>
-<body>
-    <div class="container">
-        <!-- Auth Section -->
-        <div id="authSection" class="auth-container">
-            <div class="auth-form">
-                <h1 class="visually-hidden">ShadowChat</h1>
-                <div id="notificationBanner" class="notification-banner" style="display: none;">
-                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                    </svg>
-                    <span>Enable notifications</span>
-                    <button onclick="requestNotificationPermission()" class="enable-notif-btn">Enable</button>
-                </div>
-                <div id="errorMessage" class="error-message"></div>
-                <div id="successMessage" class="success-message"></div>
-                
-                <div id="loginForm">
-                    <div class="input-group">
-                        <label>Username</label>
-                        <input type="text" id="loginUsername" placeholder="Enter username">
-                    </div>
-                    <div class="input-group">
-                        <label>Password</label>
-                        <input type="password" id="loginPassword" placeholder="Enter password">
-                    </div>
-                    <button onclick="login()">Sign In</button>
-                    <div class="switch-auth">
-                        No account? <a onclick="showRegister()">Create one</a>
-                    </div>
-                </div>
-
-                <div id="registerForm" style="display:none;">
-                    <div class="input-group">
-                        <label>Username</label>
-                        <input type="text" id="registerUsername" placeholder="Choose username">
-                    </div>
-                    <div class="input-group">
-                        <label>Password</label>
-                        <input type="password" id="registerPassword" placeholder="Choose password">
-                    </div>
-                    <div class="input-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="confirmPassword" placeholder="Confirm password">
-                    </div>
-                    <button onclick="register()">Create Account</button>
-                    <div class="switch-auth">
-                        Already have an account? <a onclick="showLogin()">Sign in</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main App -->
-        <div id="appSection" class="app-container">
-            <div class="header">
-                <div class="user-info">
-                    <span class="username-display" id="currentUsername"></span>
-                    <button onclick="logout()" class="logout-btn">Exit</button>
-                </div>
-            </div>
-            <div class="messages-container" id="messagesContainer"></div>
-            <div class="message-input-container">
-                <div class="input-buttons">
-                    <button class="icon-btn" onclick="document.getElementById('imageInput').click()">
-                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
-                            <circle cx="8.5" cy="8.5" r="2.5" />
-                            <path d="M21 15l-5-4-3 3-4-4-5 5" />
-                        </svg>
-                    </button>
-                    <button class="icon-btn" id="micBtn" onclick="startVoiceRecording()">
-                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z" />
-                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                            <line x1="12" y1="19" x2="12" y2="22" />
-                        </svg>
-                    </button>
-                </div>
-                <textarea class="message-input" id="messageInput" rows="1" placeholder="Type a message..."></textarea>
-                <button onclick="sendMessage()" class="send-btn">Send</button>
-            </div>
-        </div>
-    </div>
-
-    <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
-
-    <!-- Action Menu Popup -->
-    <div id="actionMenu" class="action-menu">
-        <button class="action-menu-item" id="editAction">Edit</button>
-        <div class="action-menu-divider"></div>
-        <button class="action-menu-item delete" id="deleteAction">Delete</button>
-    </div>
-
-    <!-- Edit Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h3>Edit Message</h3>
-            <textarea id="editText" rows="3"></textarea>
-            <div class="modal-buttons">
-                <button onclick="saveEdit()">Save</button>
-                <button onclick="closeEditModal()" style="background: #3a3a3a;">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Image Modal -->
-    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
-        <img id="modalImage" src="">
-    </div>
 </body>
 </html>
