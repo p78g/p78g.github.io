@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShadowChat - Private Messaging</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ShadowChat</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: #0a0a0a;
             min-height: 100vh;
             display: flex;
@@ -24,13 +24,13 @@
         .container {
             background: #1a1a1a;
             border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             width: 100%;
             max-width: 1000px;
             height: 90vh;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         /* Auth Forms */
@@ -50,14 +50,16 @@
             margin: 0 auto;
         }
 
-        .auth-form h2 {
-            background: linear-gradient(135deg, #a78bfa 0%, #ec489a 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 32px;
-            font-size: 2em;
-            font-weight: 600;
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         .input-group {
@@ -86,7 +88,7 @@
 
         .input-group input:focus {
             outline: none;
-            border-color: #a78bfa;
+            border-color: #25D366;
             background: #2f2f2f;
         }
 
@@ -95,7 +97,7 @@
         }
 
         button {
-            background: linear-gradient(135deg, #a78bfa 0%, #ec489a 100%);
+            background: #25D366;
             color: white;
             padding: 12px 24px;
             border: none;
@@ -108,8 +110,8 @@
         }
 
         button:hover {
+            background: #20b859;
             transform: translateY(-1px);
-            box-shadow: 0 10px 20px -10px rgba(167, 139, 250, 0.4);
         }
 
         .switch-auth {
@@ -119,7 +121,7 @@
         }
 
         .switch-auth a {
-            color: #a78bfa;
+            color: #25D366;
             cursor: pointer;
             text-decoration: none;
             font-weight: 500;
@@ -153,8 +155,8 @@
 
         /* Notification Permission Banner */
         .notification-banner {
-            background: linear-gradient(135deg, rgba(167, 139, 250, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
-            border: 1px solid rgba(167, 139, 250, 0.3);
+            background: rgba(37, 211, 102, 0.1);
+            border: 1px solid rgba(37, 211, 102, 0.3);
             border-radius: 12px;
             padding: 12px 16px;
             margin-bottom: 20px;
@@ -166,27 +168,29 @@
         }
 
         .notification-banner span {
-            color: #a78bfa;
+            color: #25D366;
             flex: 1;
         }
 
         .enable-notif-btn {
-            background: rgba(167, 139, 250, 0.2);
+            background: rgba(37, 211, 102, 0.2);
             padding: 6px 16px;
             width: auto;
             font-size: 0.85em;
         }
 
-        /* Main App */
+        /* Main App - WhatsApp Style */
         .app-container {
             display: none;
             flex-direction: column;
             height: 100%;
+            background: #0a0a0a;
         }
 
+        /* Header - WhatsApp Style */
         .header {
-            background: #0f0f0f;
-            padding: 20px 24px;
+            background: #1a1a1a;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -194,24 +198,29 @@
         }
 
         .header h2 {
-            background: linear-gradient(135deg, #a78bfa 0%, #ec489a 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 1.5em;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         .user-info {
             display: flex;
-            gap: 16px;
             align-items: center;
+            gap: 16px;
+            margin-left: auto;
         }
 
         .username-display {
-            color: #a78bfa;
+            color: #25D366;
             font-weight: 600;
             font-size: 0.95em;
-            background: rgba(167, 139, 250, 0.1);
+            background: rgba(37, 211, 102, 0.1);
             padding: 6px 12px;
             border-radius: 20px;
         }
@@ -226,29 +235,96 @@
         .logout-btn:hover {
             background: rgba(255, 255, 255, 0.1);
             transform: none;
-            box-shadow: none;
         }
 
+        /* Messages Container - WhatsApp Style */
         .messages-container {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
-            background: #0f0f0f;
+            padding: 20px;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Message Bubbles - WhatsApp Style */
         .message {
+            display: flex;
+            margin-bottom: 12px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 8px 12px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.sent .message-bubble {
+            background: #25D366;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received .message-bubble {
             background: #1a1a1a;
-            padding: 16px;
-            margin-bottom: 16px;
-            border-radius: 16px;
+            color: #e5e7eb;
+            border-bottom-left-radius: 4px;
             border: 1px solid #2a2a2a;
-            animation: fadeIn 0.3s ease;
+        }
+
+        .message-sender {
+            font-size: 0.7em;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .message.sent .message-sender {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: right;
+        }
+
+        .message.received .message-sender {
+            color: #25D366;
+        }
+
+        .message-content {
+            font-size: 0.95em;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .message-time {
+            font-size: 0.65em;
+            margin-top: 4px;
+            display: block;
+            text-align: right;
+            opacity: 0.7;
+        }
+
+        .message.sent .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message.received .message-time {
+            color: #6b7280;
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
@@ -256,55 +332,33 @@
             }
         }
 
-        .message-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        .message-sender {
-            font-weight: 600;
-            color: #a78bfa;
-            font-size: 0.9em;
-        }
-
-        .message-time {
-            color: #6b7280;
-            font-size: 0.75em;
-        }
-
-        .message-content {
-            color: #e5e7eb;
-            line-height: 1.5;
-            font-size: 0.95em;
-        }
-
+        /* Input Area - WhatsApp Style */
         .message-input-container {
-            padding: 20px 24px;
-            background: #0f0f0f;
+            padding: 16px 20px;
+            background: #1a1a1a;
             border-top: 1px solid #2a2a2a;
             display: flex;
             gap: 12px;
+            align-items: flex-end;
         }
 
         .message-input {
             flex: 1;
             padding: 12px 16px;
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-radius: 12px;
-            font-size: 14px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 24px;
+            font-size: 15px;
             color: #ffffff;
             resize: none;
             font-family: inherit;
+            max-height: 100px;
         }
 
         .message-input:focus {
             outline: none;
-            border-color: #a78bfa;
-            background: #1f1f1f;
+            border-color: #25D366;
+            background: #2f2f2f;
         }
 
         .message-input::placeholder {
@@ -312,8 +366,11 @@
         }
 
         .send-btn {
+            background: #25D366;
+            padding: 12px 24px;
             width: auto;
-            padding: 12px 28px;
+            border-radius: 24px;
+            font-weight: 600;
         }
 
         .empty-messages {
@@ -337,22 +394,14 @@
             border-radius: 3px;
         }
 
-        .messages-container::-webkit-scrollbar-thumb:hover {
-            background: #4a4a4a;
-        }
-
         @media (max-width: 768px) {
             .container {
                 height: 100vh;
                 border-radius: 0;
             }
             
-            .message-input-container {
-                flex-direction: column;
-            }
-            
-            .send-btn {
-                width: 100%;
+            .message-bubble {
+                max-width: 85%;
             }
 
             .auth-container {
@@ -366,7 +415,7 @@
         <!-- Authentication Section -->
         <div id="authSection" class="auth-container">
             <div class="auth-form">
-                <h2>✦ ShadowChat</h2>
+                <h1 class="visually-hidden">ShadowChat - Private Messaging Platform</h1>
                 
                 <!-- Notification Permission Banner -->
                 <div id="notificationBanner" class="notification-banner" style="display: none;">
@@ -416,7 +465,7 @@
         <!-- Main App Section -->
         <div id="appSection" class="app-container">
             <div class="header">
-                <h2>✦ ShadowChat</h2>
+                <h2>ShadowChat</h2>
                 <div class="user-info">
                     <span class="username-display" id="currentUsername"></span>
                     <button onclick="logout()" class="logout-btn">Exit</button>
@@ -426,7 +475,7 @@
                 <div class="empty-messages">No messages yet. Start the conversation!</div>
             </div>
             <div class="message-input-container">
-                <textarea class="message-input" id="messageInput" rows="2" placeholder="Type your message..."></textarea>
+                <textarea class="message-input" id="messageInput" rows="1" placeholder="Type a message..."></textarea>
                 <button onclick="sendMessage()" class="send-btn">Send</button>
             </div>
         </div>
@@ -440,7 +489,7 @@
         let lastMessageCount = 0;
         let notificationPermission = false;
 
-        // Notification System
+        // Notification System - ENABLE THIS!
         function checkNotificationSupport() {
             if (!("Notification" in window)) {
                 console.log("This browser does not support notifications");
@@ -449,6 +498,10 @@
             return true;
         }
 
+        // HOW TO ENABLE NOTIFICATIONS:
+        // 1. Click the "Enable" button in the purple/green banner
+        // 2. Click "Allow" when the browser popup appears
+        // 3. That's it! You'll get notifications for new messages
         function requestNotificationPermission() {
             if (!checkNotificationSupport()) {
                 showError("Your browser doesn't support notifications");
@@ -460,44 +513,29 @@
                     notificationPermission = true;
                     localStorage.setItem('shadowchat_notifications', 'granted');
                     document.getElementById('notificationBanner').style.display = 'none';
-                    showSuccess("Notifications enabled! You'll receive alerts for new messages.");
+                    showSuccess("✓ Notifications enabled!");
                     
-                    // Send a test notification
-                    new Notification("✨ Notifications Enabled", {
-                        body: "You'll now receive alerts when you get new messages",
-                        icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a78bfa'%3E%3Cpath d='M20 17h2v2H2v-2h2v-7a8 8 0 1 1 16 0v7zm-2 0v-7a6 6 0 1 0-12 0v7h12zm-9 4h6v2h-6v-2z'/%3E%3C/svg%3E"
+                    // Test notification
+                    new Notification("ShadowChat", {
+                        body: "You'll now receive alerts for new messages",
+                        icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2325D366'%3E%3Cpath d='M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E"
                     });
                 } else {
-                    showError("Notifications blocked. You can enable them in browser settings.");
+                    showError("Notifications blocked. Enable in browser settings.");
                 }
             });
         }
 
-        function sendNotification(sender, message, timestamp) {
-            if (!notificationPermission && Notification.permission === "granted") {
-                notificationPermission = true;
-            }
-            
+        function sendNotification(sender, message) {
             if (notificationPermission || Notification.permission === "granted") {
-                // Don't notify for your own messages
                 if (sender === currentUser) return;
                 
-                // Create notification
-                const notification = new Notification(`📨 New message from ${sender}`, {
-                    body: message.length > 60 ? message.substring(0, 57) + "..." : message,
-                    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a78bfa'%3E%3Cpath d='M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z'/%3E%3C/svg%3E",
+                new Notification(`📨 ${sender}`, {
+                    body: message.length > 50 ? message.substring(0, 47) + "..." : message,
+                    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2325D366'%3E%3Cpath d='M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E",
                     silent: false,
-                    vibrate: [200, 100, 200] // Vibration pattern for mobile
+                    vibrate: [200, 100, 200]
                 });
-                
-                // Auto-close after 5 seconds
-                setTimeout(() => notification.close(), 5000);
-                
-                // Optional: Play a subtle sound (iOS style)
-                try {
-                    const audio = new Audio('data:audio/wav;base64,U3RlYWx0aCBzb3VuZA==');
-                    // Note: This is a placeholder. Actual sound would need a real audio file
-                } catch(e) { /* Silently fail if audio not supported */ }
             }
         }
 
@@ -509,44 +547,36 @@
             
             if (storedUsers) {
                 users = JSON.parse(storedUsers);
-                console.log('✅ Loaded users:', Object.keys(users).length);
             } else {
                 users = {};
-                console.log('📝 No users found, starting fresh');
                 saveUsers();
             }
             
             if (storedMessages) {
                 messages = JSON.parse(storedMessages);
                 lastMessageCount = messages.length;
-                console.log('✅ Loaded messages:', messages.length);
             } else {
                 messages = [];
                 lastMessageCount = 0;
-                console.log('📝 No messages found, starting fresh');
                 saveMessages();
             }
             
-            // Check notification permission
             if (storedNotifPref === 'granted' && Notification.permission === "granted") {
                 notificationPermission = true;
             } else if (Notification.permission === "granted") {
                 notificationPermission = true;
                 localStorage.setItem('shadowchat_notifications', 'granted');
             } else if (Notification.permission === "default") {
-                // Show banner to ask for permission
                 document.getElementById('notificationBanner').style.display = 'flex';
             }
         }
 
         function saveUsers() {
             localStorage.setItem('shadowchat_users', JSON.stringify(users));
-            console.log('💾 Users saved to localStorage');
         }
 
         function saveMessages() {
             localStorage.setItem('shadowchat_messages', JSON.stringify(messages));
-            console.log('💾 Messages saved to localStorage:', messages.length);
         }
 
         function showError(message) {
@@ -611,7 +641,6 @@
                 return;
             }
 
-            // Create new user
             users[username] = {
                 username: username,
                 password: btoa(password),
@@ -646,22 +675,17 @@
             currentUser = username;
             localStorage.setItem('shadowchat_currentUser', currentUser);
             
-            // Switch to main app
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('appSection').style.display = 'flex';
             document.getElementById('currentUsername').textContent = currentUser;
             
-            // Reload messages from storage to ensure they're fresh
             const storedMessages = localStorage.getItem('shadowchat_messages');
             if (storedMessages) {
                 messages = JSON.parse(storedMessages);
                 lastMessageCount = messages.length;
-                console.log('📨 Reloaded messages on login:', messages.length);
             }
             
             loadMessages();
-            
-            // Clear login fields
             document.getElementById('loginUsername').value = '';
             document.getElementById('loginPassword').value = '';
         }
@@ -671,8 +695,6 @@
             localStorage.removeItem('shadowchat_currentUser');
             document.getElementById('authSection').style.display = 'flex';
             document.getElementById('appSection').style.display = 'none';
-            
-            // Clear the messages container
             document.getElementById('messagesContainer').innerHTML = '<div class="empty-messages">No messages yet. Start the conversation!</div>';
         }
 
@@ -692,18 +714,17 @@
             };
             
             messages.push(newMessage);
-            saveMessages(); // Save immediately to localStorage
+            saveMessages();
             lastMessageCount = messages.length;
-            console.log('📤 Message sent and saved:', newMessage);
             
             messageInput.value = '';
-            loadMessages(); // Refresh display
+            messageInput.style.height = 'auto';
+            loadMessages();
         }
 
         function loadMessages() {
             const container = document.getElementById('messagesContainer');
             
-            // Always read the latest messages from localStorage
             const storedMessages = localStorage.getItem('shadowchat_messages');
             if (storedMessages) {
                 messages = JSON.parse(storedMessages);
@@ -714,20 +735,21 @@
                 return;
             }
             
-            // Sort messages by timestamp (oldest first)
             const sortedMessages = [...messages].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
             
-            container.innerHTML = sortedMessages.map(message => `
-                <div class="message">
-                    <div class="message-header">
-                        <span class="message-sender">${escapeHtml(message.sender)}</span>
-                        <span class="message-time">${formatTime(message.timestamp)}</span>
+            container.innerHTML = sortedMessages.map(message => {
+                const isSent = message.sender === currentUser;
+                return `
+                    <div class="message ${isSent ? 'sent' : 'received'}">
+                        <div class="message-bubble">
+                            <span class="message-sender">${escapeHtml(message.sender)}</span>
+                            <div class="message-content">${escapeHtml(message.content)}</div>
+                            <span class="message-time">${formatTime(message.timestamp)}</span>
+                        </div>
                     </div>
-                    <div class="message-content">${escapeHtml(message.content)}</div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             
-            // Scroll to bottom
             container.scrollTop = container.scrollHeight;
         }
 
@@ -736,10 +758,9 @@
             const now = new Date();
             const diff = now - date;
             
-            if (diff < 60000) return 'just now';
-            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 60000) return 'now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
             if (diff < 86400000) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
             return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
         }
 
@@ -749,7 +770,6 @@
             return div.innerHTML;
         }
 
-        // Check for existing session
         function checkSession() {
             const savedUser = localStorage.getItem('shadowchat_currentUser');
             if (savedUser && users[savedUser]) {
@@ -758,14 +778,11 @@
                 document.getElementById('appSection').style.display = 'flex';
                 document.getElementById('currentUsername').textContent = currentUser;
                 
-                // Load messages from storage
                 const storedMessages = localStorage.getItem('shadowchat_messages');
                 if (storedMessages) {
                     messages = JSON.parse(storedMessages);
                     lastMessageCount = messages.length;
-                    console.log('📨 Loaded messages from session:', messages.length);
                 }
-                
                 loadMessages();
             }
         }
@@ -777,47 +794,48 @@
             if (refreshInterval) clearInterval(refreshInterval);
             refreshInterval = setInterval(() => {
                 if (currentUser) {
-                    // Read latest messages
                     const storedMessages = localStorage.getItem('shadowchat_messages');
                     if (storedMessages) {
                         const newMessages = JSON.parse(storedMessages);
                         
-                        // Check for new messages
                         if (newMessages.length > lastMessageCount) {
-                            // New messages detected!
                             const newMessagesList = newMessages.slice(lastMessageCount);
-                            
-                            // Send notification for each new message
                             newMessagesList.forEach(msg => {
-                                // Don't notify for own messages
                                 if (msg.sender !== currentUser) {
-                                    sendNotification(msg.sender, msg.content, msg.timestamp);
+                                    sendNotification(msg.sender, msg.content);
                                 }
                             });
-                            
-                            console.log(`🔔 ${newMessagesList.length} new message(s) detected!`);
-                            
-                            // Update messages and refresh display
                             messages = newMessages;
                             lastMessageCount = messages.length;
                             loadMessages();
                         } else if (JSON.stringify(messages) !== JSON.stringify(newMessages)) {
-                            // Just update display without notification
                             messages = newMessages;
                             lastMessageCount = messages.length;
                             loadMessages();
                         }
                     }
                 }
-            }, 2000); // Check every 2 seconds
+            }, 2000);
         }
 
-        // Initialize everything
+        // Auto-resize textarea
+        function autoResizeTextarea() {
+            const textarea = document.getElementById('messageInput');
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+                });
+            }
+        }
+
+        // Initialize
         loadData();
         checkSession();
         startAutoRefresh();
+        autoResizeTextarea();
 
-        // Allow Enter to send (Shift+Enter for new line)
+        // Enter to send
         document.addEventListener('DOMContentLoaded', () => {
             const messageInput = document.getElementById('messageInput');
             if (messageInput) {
