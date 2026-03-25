@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>ShadowChat</title>
     <style>
+        /* (All existing styles from the previous version – unchanged) */
         * {
             margin: 0;
             padding: 0;
@@ -483,7 +484,6 @@
             gap: 8px;
         }
 
-        /* Clean SVG Icons */
         .icon-btn {
             background: #2a2a2a;
             width: 40px;
@@ -629,6 +629,587 @@
             }
         }
     </style>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJ8wf399dp0nxFYl8y7SoarcDUOiZ7Wow",
+            authDomain: "chatappv2-b6bd8.firebaseapp.com",
+            projectId: "chatappv2-b6bd8",
+            storageBucket: "chatappv2-b6bd8.firebasestorage.app",
+            messagingSenderId: "458480303979",
+            appId: "1:458480303979:web:a3a83ed05856d23df6d62e",
+            measurementId: "G-ZS3DQJS2HW"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Expose necessary functions to global scope for HTML onclick
+        window.requestNotificationPermission = requestNotificationPermission;
+        window.startVoiceRecording = startVoiceRecording;
+        window.handleImageUpload = handleImageUpload;
+        window.playVoice = playVoice;
+        window.viewImage = viewImage;
+        window.sendMessage = sendMessage;
+        window.logout = logout;
+        window.showRegister = showRegister;
+        window.showLogin = showLogin;
+        window.register = register;
+        window.login = login;
+        window.editMessage = editMessage;
+        window.deleteMessage = deleteMessage;
+        window.saveEdit = saveEdit;
+        window.closeEditModal = closeEditModal;
+        window.closeImageModal = closeImageModal;
+
+        // Global variables
+        let currentUser = null;
+        let currentUsername = "";
+        let currentUserId = null;
+        let messages = [];
+        let lastMessageCount = 0;
+        let editingMessageId = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let selectedMessageId = null;
+        let currentAudio = null;
+        let pressTimer = null;
+        let longPressTriggered = false;
+        let messagesUnsubscribe = null;
+
+        // DOM elements
+        const authSection = document.getElementById('authSection');
+        const appSection = document.getElementById('appSection');
+        const currentUsernameSpan = document.getElementById('currentUsername');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const micBtn = document.getElementById('micBtn');
+        const notificationBanner = document.getElementById('notificationBanner');
+        const errorDiv = document.getElementById('errorMessage');
+        const successDiv = document.getElementById('successMessage');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginUsername = document.getElementById('loginUsername');
+        const loginPassword = document.getElementById('loginPassword');
+        const registerUsername = document.getElementById('registerUsername');
+        const registerEmail = document.getElementById('registerEmail');
+        const registerPassword = document.getElementById('registerPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+
+        // Helper functions
+        function showError(msg) {
+            errorDiv.textContent = msg;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 3000);
+        }
+
+        function showSuccess(msg) {
+            successDiv.textContent = msg;
+            successDiv.style.display = 'block';
+            setTimeout(() => successDiv.style.display = 'none', 3000);
+        }
+
+        // Notification
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) return;
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    localStorage.setItem('shadowchat_notifications', 'granted');
+                    notificationBanner.style.display = 'none';
+                    showSuccess("Notifications enabled");
+                }
+            });
+        }
+
+        // Long press handlers
+        function startLongPress(messageId, event) {
+            const target = event.target;
+            if (target.closest('.embed-video iframe') || 
+                target.closest('.embed-link') || 
+                target.closest('.message-image') || 
+                target.closest('.play-btn')) {
+                return;
+            }
+            longPressTriggered = false;
+            pressTimer = setTimeout(() => {
+                longPressTriggered = true;
+                showActionMenu(messageId, event);
+            }, 500);
+        }
+
+        function cancelLongPress() {
+            if (pressTimer) clearTimeout(pressTimer);
+        }
+
+        function showActionMenu(messageId, event) {
+            const message = messages.find(m => m.id === messageId);
+            if (!message || message.senderId !== currentUserId) return;
+            selectedMessageId = messageId;
+            const menu = document.getElementById('actionMenu');
+            let x, y;
+            if (event.touches) {
+                x = event.touches[0].clientX;
+                y = event.touches[0].clientY;
+                event.preventDefault();
+            } else {
+                x = event.clientX;
+                y = event.clientY;
+            }
+            menu.style.display = 'flex';
+            menu.style.left = (x - 70) + 'px';
+            menu.style.top = (y - 60) + 'px';
+            setTimeout(() => {
+                document.addEventListener('click', closeActionMenu);
+                document.addEventListener('touchstart', closeActionMenu);
+            }, 0);
+        }
+
+        function closeActionMenu() {
+            document.getElementById('actionMenu').style.display = 'none';
+            selectedMessageId = null;
+            document.removeEventListener('click', closeActionMenu);
+            document.removeEventListener('touchstart', closeActionMenu);
+        }
+
+        function editSelectedMessage() {
+            if (selectedMessageId) {
+                editMessage(selectedMessageId);
+                closeActionMenu();
+            }
+        }
+
+        function deleteSelectedMessage() {
+            if (selectedMessageId) {
+                if (confirm("Delete this message?")) {
+                    deleteMessage(selectedMessageId);
+                }
+                closeActionMenu();
+            }
+        }
+
+        // Voice Recording
+        async function startVoiceRecording() {
+            if (isRecording) {
+                stopVoiceRecording();
+                return;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.onloadend = () => sendVoiceMessage(reader.result);
+                    reader.readAsDataURL(audioBlob);
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                mediaRecorder.start();
+                isRecording = true;
+                micBtn.classList.add('active');
+                showSuccess("Recording... Tap again to stop");
+                setTimeout(() => { if (isRecording) stopVoiceRecording(); }, 60000);
+            } catch (err) {
+                showError("Microphone access denied");
+            }
+        }
+
+        function stopVoiceRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                micBtn.classList.remove('active');
+            }
+        }
+
+        async function sendVoiceMessage(audioData) {
+            if (!currentUserId) return;
+            await addDoc(collection(db, "messages"), {
+                senderId: currentUserId,
+                senderName: currentUsername,
+                type: "voice",
+                content: audioData,
+                timestamp: Timestamp.now(),
+                edited: false
+            });
+        }
+
+        // Image Upload
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => sendImageMessage(e.target.result);
+                reader.readAsDataURL(file);
+            }
+            input.value = '';
+        }
+
+        async function sendImageMessage(imageData) {
+            if (!currentUserId) return;
+            await addDoc(collection(db, "messages"), {
+                senderId: currentUserId,
+                senderName: currentUsername,
+                type: "image",
+                content: imageData,
+                timestamp: Timestamp.now(),
+                edited: false
+            });
+        }
+
+        // Play Voice with SVG toggle
+        function playVoice(audioData, btnElement) {
+            if (currentAudio && !currentAudio.paused) {
+                currentAudio.pause();
+                currentAudio = null;
+                updatePlayButtonIcon(btnElement, false);
+                return;
+            }
+            const audio = new Audio(audioData);
+            currentAudio = audio;
+            updatePlayButtonIcon(btnElement, true);
+            audio.play();
+            audio.onended = () => {
+                currentAudio = null;
+                updatePlayButtonIcon(btnElement, false);
+            };
+        }
+
+        function updatePlayButtonIcon(btn, isPlaying) {
+            if (isPlaying) {
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>`;
+            } else {
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>`;
+            }
+        }
+
+        // Detect and embed links
+        function detectAndEmbedLinks(text) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const urls = text.match(urlRegex);
+            if (!urls) return { text, embeds: [] };
+            let processedText = text;
+            const embeds = [];
+            for (const url of urls) {
+                if (url.includes('youtube.com/watch') || url.includes('youtu.be/')) {
+                    let videoId = '';
+                    if (url.includes('youtu.be/')) {
+                        videoId = url.split('youtu.be/')[1].split('?')[0];
+                    } else {
+                        videoId = url.split('v=')[1]?.split('&')[0];
+                    }
+                    if (videoId) {
+                        embeds.push({ type: 'youtube', url: `https://www.youtube.com/embed/${videoId}`, originalUrl: url });
+                        processedText = processedText.replace(url, '');
+                    }
+                } else if (url.includes('vimeo.com/')) {
+                    const vimeoId = url.split('vimeo.com/')[1].split('?')[0];
+                    embeds.push({ type: 'vimeo', url: `https://player.vimeo.com/video/${vimeoId}`, originalUrl: url });
+                    processedText = processedText.replace(url, '');
+                } else {
+                    embeds.push({ type: 'link', url: url, originalUrl: url });
+                }
+            }
+            return { text: processedText.trim(), embeds };
+        }
+
+        // Edit Message
+        async function editMessage(id) {
+            const message = messages.find(m => m.id === id);
+            if (message && message.senderId === currentUserId) {
+                editingMessageId = id;
+                document.getElementById('editText').value = message.content;
+                document.getElementById('editModal').style.display = 'flex';
+            }
+        }
+
+        async function saveEdit() {
+            const newContent = document.getElementById('editText').value.trim();
+            if (newContent && editingMessageId) {
+                const msgRef = doc(db, "messages", editingMessageId);
+                await updateDoc(msgRef, {
+                    content: newContent,
+                    edited: true,
+                    editedAt: Timestamp.now()
+                });
+                closeEditModal();
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            editingMessageId = null;
+        }
+
+        // Delete Message
+        async function deleteMessage(id) {
+            const msgRef = doc(db, "messages", id);
+            await deleteDoc(msgRef);
+        }
+
+        // View Image
+        function viewImage(imageData) {
+            document.getElementById('modalImage').src = imageData;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Send text message
+        async function sendMessage() {
+            const content = messageInput.value.trim();
+            if (!content) return;
+            const { text, embeds } = detectAndEmbedLinks(content);
+            await addDoc(collection(db, "messages"), {
+                senderId: currentUserId,
+                senderName: currentUsername,
+                type: "text",
+                content: text,
+                embeds: embeds,
+                timestamp: Timestamp.now(),
+                edited: false
+            });
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+        }
+
+        // Load messages in real-time
+        function loadMessagesRealtime() {
+            if (messagesUnsubscribe) messagesUnsubscribe();
+            const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
+            messagesUnsubscribe = onSnapshot(q, (snapshot) => {
+                messages = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    // Convert Firestore Timestamp to JS Date
+                    const timestamp = data.timestamp?.toDate() || new Date();
+                    messages.push({
+                        id: doc.id,
+                        ...data,
+                        timestamp: timestamp.toISOString()
+                    });
+                });
+                renderMessages();
+                lastMessageCount = messages.length;
+            });
+        }
+
+        function renderMessages() {
+            if (!messagesContainer) return;
+            if (!messages.length) {
+                messagesContainer.innerHTML = '<div class="empty-messages">No messages yet</div>';
+                return;
+            }
+            const sorted = [...messages].sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+            messagesContainer.innerHTML = sorted.map(msg => {
+                const isSent = msg.senderId === currentUserId;
+                let contentHtml = '';
+                if (msg.type === 'image') {
+                    contentHtml = `<img src="${msg.content}" class="message-image" onclick="viewImage('${msg.content}')" style="pointer-events: auto;">`;
+                } else if (msg.type === 'voice') {
+                    contentHtml = `
+                        <div class="voice-message">
+                            <button class="play-btn" onclick="playVoice('${msg.content}', this)" style="pointer-events: auto;">
+                                <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                </svg>
+                            </button>
+                            <span class="voice-duration">Voice note</span>
+                        </div>
+                    `;
+                } else {
+                    let textContent = escapeHtml(msg.content);
+                    if (textContent === '') textContent = ' ';
+                    contentHtml = `<div class="message-content">${textContent}</div>`;
+                    if (msg.embeds && msg.embeds.length > 0) {
+                        msg.embeds.forEach(embed => {
+                            if (embed.type === 'youtube' || embed.type === 'vimeo') {
+                                contentHtml += `
+                                    <div class="link-embed">
+                                        <div class="embed-video">
+                                            <iframe src="${embed.url}" frameborder="0" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (embed.type === 'link') {
+                                contentHtml += `
+                                    <a href="${embed.url}" target="_blank" class="link-embed embed-link" style="pointer-events: auto;">
+                                        <div class="embed-info">
+                                            <div class="embed-url">${escapeHtml(embed.url)}</div>
+                                            <div class="embed-title">Open Link</div>
+                                        </div>
+                                    </a>
+                                `;
+                            }
+                        });
+                    }
+                }
+                const editedHtml = msg.edited ? '<span class="edited-indicator">edited</span>' : '';
+                return `
+                    <div class="message ${isSent ? 'sent' : 'received'}"
+                         onmousedown="startLongPress('${msg.id}', event)"
+                         ontouchstart="startLongPress('${msg.id}', event)"
+                         onmouseup="cancelLongPress()"
+                         ontouchend="cancelLongPress()"
+                         onmouseleave="cancelLongPress()">
+                        <div class="message-bubble">
+                            <span class="message-sender">${escapeHtml(msg.senderName)}</span>
+                            ${contentHtml}
+                            <span class="message-time">${formatTime(msg.timestamp)}${editedHtml}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function formatTime(ts) {
+            const date = new Date(ts);
+            const now = new Date();
+            const diff = now - date;
+            if (diff < 60000) return 'now';
+            if (diff < 3600000) return `${Math.floor(diff/60000)}m`;
+            if (diff < 86400000) return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            return date.toLocaleDateString([], {month:'short', day:'numeric'});
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auth UI functions
+        function showRegister() {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+        }
+
+        function showLogin() {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+        }
+
+        async function register() {
+            const username = registerUsername.value.trim();
+            const email = registerEmail.value.trim();
+            const password = registerPassword.value;
+            const confirm = confirmPassword.value;
+            if (!username || !email || !password) return showError('Fill all fields');
+            if (password !== confirm) return showError('Passwords do not match');
+            try {
+                const userCred = await createUserWithEmailAndPassword(auth, email, password);
+                // Store username in Firestore under users collection
+                await addDoc(collection(db, "users"), {
+                    uid: userCred.user.uid,
+                    username: username,
+                    email: email
+                });
+                showSuccess('Account created! Please log in.');
+                showLogin();
+                registerUsername.value = '';
+                registerEmail.value = '';
+                registerPassword.value = '';
+                confirmPassword.value = '';
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        async function login() {
+            const email = loginUsername.value.trim(); // Actually email, but field label is Username
+            const password = loginPassword.value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // Auth state will trigger onAuthStateChanged
+                loginUsername.value = '';
+                loginPassword.value = '';
+            } catch (err) {
+                showError('Invalid email or password');
+            }
+        }
+
+        async function logout() {
+            await signOut(auth);
+            // Auth state will handle UI
+        }
+
+        // Auth state listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                // Fetch username from Firestore
+                const usersQuery = query(collection(db, "users"), where("uid", "==", user.uid));
+                const querySnapshot = await getDocs(usersQuery);
+                if (!querySnapshot.empty) {
+                    const userDoc = querySnapshot.docs[0];
+                    currentUsername = userDoc.data().username;
+                } else {
+                    currentUsername = user.email.split('@')[0]; // fallback
+                }
+                currentUser = user;
+                authSection.style.display = 'none';
+                appSection.style.display = 'flex';
+                currentUsernameSpan.textContent = currentUsername;
+                loadMessagesRealtime();
+            } else {
+                if (messagesUnsubscribe) messagesUnsubscribe();
+                authSection.style.display = 'flex';
+                appSection.style.display = 'none';
+                currentUser = null;
+                currentUserId = null;
+                currentUsername = "";
+                messages = [];
+                if (currentAudio) currentAudio.pause();
+            }
+        });
+
+        // Auto-resize textarea
+        if (messageInput) {
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            });
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+
+        // Setup action menu buttons
+        document.getElementById('editAction').onclick = editSelectedMessage;
+        document.getElementById('deleteAction').onclick = deleteSelectedMessage;
+
+        // Notification permission
+        if (Notification.permission === "default") {
+            notificationBanner.style.display = 'flex';
+        } else if (Notification.permission === "granted") {
+            notificationBanner.style.display = 'none';
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -649,8 +1230,8 @@
                 
                 <div id="loginForm">
                     <div class="input-group">
-                        <label>Username</label>
-                        <input type="text" id="loginUsername" placeholder="Enter username">
+                        <label>Email</label>
+                        <input type="email" id="loginUsername" placeholder="Enter email">
                     </div>
                     <div class="input-group">
                         <label>Password</label>
@@ -666,6 +1247,10 @@
                     <div class="input-group">
                         <label>Username</label>
                         <input type="text" id="registerUsername" placeholder="Choose username">
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" placeholder="Enter email">
                     </div>
                     <div class="input-group">
                         <label>Password</label>
@@ -741,628 +1326,19 @@
         <img id="modalImage" src="">
     </div>
 
-    <script>
-        let users = {};
-        let messages = [];
-        let currentUser = null;
-        let lastMessageCount = 0;
-        let editingMessageId = null;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let isRecording = false;
-        let selectedMessageId = null;
-        let currentAudio = null;
-        let pressTimer = null;
-        let longPressTriggered = false;
-
-        // Notification System
-        function requestNotificationPermission() {
-            if (!("Notification" in window)) return;
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    localStorage.setItem('shadowchat_notifications', 'granted');
-                    document.getElementById('notificationBanner').style.display = 'none';
-                    showSuccess("Notifications enabled");
-                }
-            });
-        }
-
-        // Long press handlers
-        function startLongPress(messageId, event) {
-            // Ignore if the target is inside an interactive element (iframe, link, image, play button)
-            const target = event.target;
-            if (target.closest('.embed-video iframe') || 
-                target.closest('.embed-link') || 
-                target.closest('.message-image') || 
-                target.closest('.play-btn')) {
-                return;
-            }
-            
-            longPressTriggered = false;
-            pressTimer = setTimeout(() => {
-                longPressTriggered = true;
-                showActionMenu(messageId, event);
-            }, 500);
-        }
-        
-        function cancelLongPress() {
-            if (pressTimer) {
-                clearTimeout(pressTimer);
-                pressTimer = null;
-            }
-        }
-        
-        // Action Menu
-        function showActionMenu(messageId, event) {
-            const message = messages.find(m => m.id === messageId);
-            if (!message || message.sender !== currentUser) return;
-            
-            selectedMessageId = messageId;
-            const menu = document.getElementById('actionMenu');
-            
-            let x, y;
-            if (event.touches) {
-                x = event.touches[0].clientX;
-                y = event.touches[0].clientY;
-                event.preventDefault();
-            } else {
-                x = event.clientX;
-                y = event.clientY;
-            }
-            
-            menu.style.display = 'flex';
-            menu.style.left = (x - 70) + 'px';
-            menu.style.top = (y - 60) + 'px';
-            
-            // Close menu when clicking outside
-            setTimeout(() => {
-                document.addEventListener('click', closeActionMenu);
-                document.addEventListener('touchstart', closeActionMenu);
-            }, 0);
-        }
-        
-        function closeActionMenu() {
-            document.getElementById('actionMenu').style.display = 'none';
-            selectedMessageId = null;
-            document.removeEventListener('click', closeActionMenu);
-            document.removeEventListener('touchstart', closeActionMenu);
-        }
-        
-        function editSelectedMessage() {
-            if (selectedMessageId) {
-                editMessage(selectedMessageId);
-                closeActionMenu();
-            }
-        }
-        
-        function deleteSelectedMessage() {
-            if (selectedMessageId) {
-                if (confirm("Delete this message?")) {
-                    deleteMessage(selectedMessageId);
-                }
-                closeActionMenu();
-            }
-        }
-        
-        // Voice Recording
-        async function startVoiceRecording() {
-            if (isRecording) {
-                stopVoiceRecording();
-                return;
-            }
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                
-                mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
-                };
-                
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        const audioData = reader.result;
-                        sendVoiceMessage(audioData);
-                    };
-                    reader.readAsDataURL(audioBlob);
-                    stream.getTracks().forEach(track => track.stop());
-                };
-                
-                mediaRecorder.start();
-                isRecording = true;
-                const micBtn = document.getElementById('micBtn');
-                micBtn.classList.add('active');
-                showSuccess("Recording... Tap again to stop");
-                
-                setTimeout(() => {
-                    if (isRecording) stopVoiceRecording();
-                }, 60000);
-            } catch (err) {
-                showError("Microphone access denied");
-            }
-        }
-        
-        function stopVoiceRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-                const micBtn = document.getElementById('micBtn');
-                micBtn.classList.remove('active');
-            }
-        }
-        
-        function sendVoiceMessage(audioData) {
-            if (!currentUser) return;
-            const newMessage = {
-                id: Date.now(),
-                sender: currentUser,
-                type: 'voice',
-                content: audioData,
-                timestamp: new Date().toISOString(),
-                edited: false
-            };
-            messages.push(newMessage);
-            saveMessages();
-            loadMessages();
-        }
-        
-        // Play Voice with SVG toggle
-        function playVoice(audioData, btnElement) {
-            if (currentAudio && !currentAudio.paused) {
-                currentAudio.pause();
-                currentAudio = null;
-                updatePlayButtonIcon(btnElement, false);
-                return;
-            }
-            
-            const audio = new Audio(audioData);
-            currentAudio = audio;
-            updatePlayButtonIcon(btnElement, true);
-            
-            audio.play();
-            audio.onended = () => {
-                currentAudio = null;
-                updatePlayButtonIcon(btnElement, false);
-            };
-        }
-        
-        function updatePlayButtonIcon(btn, isPlaying) {
-            if (isPlaying) {
-                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16">
-                    <rect x="6" y="4" width="4" height="16" />
-                    <rect x="14" y="4" width="4" height="16" />
-                </svg>`;
-            } else {
-                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                </svg>`;
-            }
-        }
-        
-        // Image Upload
-        function handleImageUpload(input) {
-            const file = input.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    sendImageMessage(e.target.result);
-                };
-                reader.readAsDataURL(file);
-            }
-            input.value = '';
-        }
-        
-        function sendImageMessage(imageData) {
-            if (!currentUser) return;
-            const newMessage = {
-                id: Date.now(),
-                sender: currentUser,
-                type: 'image',
-                content: imageData,
-                timestamp: new Date().toISOString(),
-                edited: false
-            };
-            messages.push(newMessage);
-            saveMessages();
-            loadMessages();
-        }
-        
-        // Detect and embed links
-        function detectAndEmbedLinks(text) {
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            const urls = text.match(urlRegex);
-            
-            if (!urls) return { text, embeds: [] };
-            
-            let processedText = text;
-            const embeds = [];
-            
-            for (const url of urls) {
-                if (url.includes('youtube.com/watch') || url.includes('youtu.be/')) {
-                    let videoId = '';
-                    if (url.includes('youtu.be/')) {
-                        videoId = url.split('youtu.be/')[1].split('?')[0];
-                    } else {
-                        videoId = url.split('v=')[1]?.split('&')[0];
-                    }
-                    if (videoId) {
-                        embeds.push({
-                            type: 'youtube',
-                            url: `https://www.youtube.com/embed/${videoId}`,
-                            originalUrl: url
-                        });
-                        processedText = processedText.replace(url, '');
-                    }
-                } 
-                else if (url.includes('vimeo.com/')) {
-                    const vimeoId = url.split('vimeo.com/')[1].split('?')[0];
-                    embeds.push({
-                        type: 'vimeo',
-                        url: `https://player.vimeo.com/video/${vimeoId}`,
-                        originalUrl: url
-                    });
-                    processedText = processedText.replace(url, '');
-                }
-                else {
-                    embeds.push({
-                        type: 'link',
-                        url: url,
-                        originalUrl: url
-                    });
-                }
-            }
-            
-            return { text: processedText.trim(), embeds };
-        }
-        
-        // Edit Message
-        function editMessage(id) {
-            const message = messages.find(m => m.id === id);
-            if (message && message.sender === currentUser) {
-                editingMessageId = id;
-                document.getElementById('editText').value = message.content;
-                document.getElementById('editModal').style.display = 'flex';
-            }
-        }
-        
-        function saveEdit() {
-            const newContent = document.getElementById('editText').value.trim();
-            if (newContent && editingMessageId) {
-                const messageIndex = messages.findIndex(m => m.id === editingMessageId);
-                if (messageIndex !== -1 && messages[messageIndex].sender === currentUser) {
-                    messages[messageIndex].content = newContent;
-                    messages[messageIndex].edited = true;
-                    messages[messageIndex].editedAt = new Date().toISOString();
-                    saveMessages();
-                    loadMessages();
-                }
-            }
-            closeEditModal();
-        }
-        
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-            editingMessageId = null;
-        }
-        
-        // Delete Message
-        function deleteMessage(id) {
-            const messageIndex = messages.findIndex(m => m.id === id);
-            if (messageIndex !== -1 && messages[messageIndex].sender === currentUser) {
-                messages.splice(messageIndex, 1);
-                saveMessages();
-                loadMessages();
-            }
-        }
-        
-        // View Image
-        function viewImage(imageData) {
-            document.getElementById('modalImage').src = imageData;
-            document.getElementById('imageModal').style.display = 'flex';
-        }
-        
-        function closeImageModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
-        
-        // Core Functions
-        function loadData() {
-            const storedUsers = localStorage.getItem('shadowchat_users');
-            const storedMessages = localStorage.getItem('shadowchat_messages');
-            if (storedUsers) users = JSON.parse(storedUsers);
-            else users = {};
-            if (storedMessages) {
-                messages = JSON.parse(storedMessages);
-                lastMessageCount = messages.length;
-            } else messages = [];
-            
-            if (Notification.permission === "default") {
-                document.getElementById('notificationBanner').style.display = 'flex';
-            }
-        }
-        
-        function saveUsers() {
-            localStorage.setItem('shadowchat_users', JSON.stringify(users));
-        }
-        
-        function saveMessages() {
-            localStorage.setItem('shadowchat_messages', JSON.stringify(messages));
-            lastMessageCount = messages.length;
-        }
-        
-        function showError(msg) {
-            const div = document.getElementById('errorMessage');
-            div.textContent = msg;
-            div.style.display = 'block';
-            setTimeout(() => div.style.display = 'none', 3000);
-        }
-        
-        function showSuccess(msg) {
-            const div = document.getElementById('successMessage');
-            div.textContent = msg;
-            div.style.display = 'block';
-            setTimeout(() => div.style.display = 'none', 3000);
-        }
-        
-        function showRegister() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
-        }
-        
-        function showLogin() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
-        }
-        
-        function register() {
-            const username = document.getElementById('registerUsername').value.trim();
-            const password = document.getElementById('registerPassword').value;
-            const confirm = document.getElementById('confirmPassword').value;
-            
-            if (!username || !password) {
-                showError('Fill all fields');
-                return;
-            }
-            if (password !== confirm) {
-                showError('Passwords do not match');
-                return;
-            }
-            if (users[username]) {
-                showError('Username exists');
-                return;
-            }
-            
-            users[username] = {
-                username: username,
-                password: btoa(password),
-                createdAt: new Date().toISOString()
-            };
-            saveUsers();
-            showSuccess('Account created!');
-            setTimeout(() => {
-                showLogin();
-                document.getElementById('registerUsername').value = '';
-                document.getElementById('registerPassword').value = '';
-                document.getElementById('confirmPassword').value = '';
-            }, 1500);
-        }
-        
-        function login() {
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            const user = users[username];
-            
-            if (!user || user.password !== btoa(password)) {
-                showError('Invalid credentials');
-                return;
-            }
-            
-            currentUser = username;
-            localStorage.setItem('shadowchat_currentUser', currentUser);
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('appSection').style.display = 'flex';
-            document.getElementById('currentUsername').textContent = currentUser;
-            
-            // Load messages
-            const storedMessages = localStorage.getItem('shadowchat_messages');
-            if (storedMessages) {
-                messages = JSON.parse(storedMessages);
-                lastMessageCount = messages.length;
-            }
-            loadMessages();
-            
-            // Clear login fields
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-        }
-        
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('shadowchat_currentUser');
-            document.getElementById('authSection').style.display = 'flex';
-            document.getElementById('appSection').style.display = 'none';
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
-            }
-        }
-        
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const content = input.value.trim();
-            if (!content) return;
-            
-            const { text, embeds } = detectAndEmbedLinks(content);
-            
-            const newMessage = {
-                id: Date.now(),
-                sender: currentUser,
-                type: 'text',
-                content: text,
-                embeds: embeds,
-                timestamp: new Date().toISOString(),
-                edited: false
-            };
-            messages.push(newMessage);
-            saveMessages();
-            input.value = '';
-            input.style.height = 'auto';
-            loadMessages();
-        }
-        
-        function loadMessages() {
-            const container = document.getElementById('messagesContainer');
-            const stored = localStorage.getItem('shadowchat_messages');
-            if (stored) messages = JSON.parse(stored);
-            
-            if (!messages.length) {
-                container.innerHTML = '<div class="empty-messages">No messages yet</div>';
-                return;
-            }
-            
-            const sorted = [...messages].sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
-            container.innerHTML = sorted.map(msg => {
-                const isSent = msg.sender === currentUser;
-                let contentHtml = '';
-                
-                if (msg.type === 'image') {
-                    contentHtml = `<img src="${msg.content}" class="message-image" onclick="viewImage('${msg.content}')" style="pointer-events: auto;">`;
-                } else if (msg.type === 'voice') {
-                    contentHtml = `
-                        <div class="voice-message">
-                            <button class="play-btn" onclick="playVoice('${msg.content}', this)" style="pointer-events: auto;">
-                                <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
-                                    <polygon points="5 3 19 12 5 21 5 3" />
-                                </svg>
-                            </button>
-                            <span class="voice-duration">Voice note</span>
-                        </div>
-                    `;
-                } else {
-                    let textContent = escapeHtml(msg.content);
-                    if (textContent === '') textContent = ' ';
-                    contentHtml = `<div class="message-content">${textContent}</div>`;
-                    
-                    if (msg.embeds && msg.embeds.length > 0) {
-                        msg.embeds.forEach(embed => {
-                            if (embed.type === 'youtube' || embed.type === 'vimeo') {
-                                contentHtml += `
-                                    <div class="link-embed">
-                                        <div class="embed-video">
-                                            <iframe src="${embed.url}" frameborder="0" allowfullscreen></iframe>
-                                        </div>
-                                    </div>
-                                `;
-                            } else if (embed.type === 'link') {
-                                contentHtml += `
-                                    <a href="${embed.url}" target="_blank" class="link-embed embed-link" style="pointer-events: auto;">
-                                        <div class="embed-info">
-                                            <div class="embed-url">${escapeHtml(embed.url)}</div>
-                                            <div class="embed-title">Open Link</div>
-                                        </div>
-                                    </a>
-                                `;
-                            }
-                        });
-                    }
-                }
-                
-                const editedHtml = msg.edited ? '<span class="edited-indicator">edited</span>' : '';
-                
-                return `
-                    <div class="message ${isSent ? 'sent' : 'received'}"
-                         onmousedown="startLongPress(${msg.id}, event)"
-                         ontouchstart="startLongPress(${msg.id}, event)"
-                         onmouseup="cancelLongPress()"
-                         ontouchend="cancelLongPress()"
-                         onmouseleave="cancelLongPress()">
-                        <div class="message-bubble">
-                            <span class="message-sender">${escapeHtml(msg.sender)}</span>
-                            ${contentHtml}
-                            <span class="message-time">${formatTime(msg.timestamp)}${editedHtml}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            container.scrollTop = container.scrollHeight;
-        }
-        
-        function formatTime(ts) {
-            const date = new Date(ts);
-            const now = new Date();
-            const diff = now - date;
-            if (diff < 60000) return 'now';
-            if (diff < 3600000) return `${Math.floor(diff/60000)}m`;
-            if (diff < 86400000) return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            return date.toLocaleDateString([], {month:'short', day:'numeric'});
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function checkSession() {
-            const saved = localStorage.getItem('shadowchat_currentUser');
-            if (saved && users[saved]) {
-                currentUser = saved;
-                document.getElementById('authSection').style.display = 'none';
-                document.getElementById('appSection').style.display = 'flex';
-                document.getElementById('currentUsername').textContent = currentUser;
-                const storedMessages = localStorage.getItem('shadowchat_messages');
-                if (storedMessages) {
-                    messages = JSON.parse(storedMessages);
-                    lastMessageCount = messages.length;
-                }
-                loadMessages();
-            }
-        }
-        
-        // Auto-refresh
-        setInterval(() => {
-            if (currentUser) {
-                const stored = localStorage.getItem('shadowchat_messages');
-                if (stored) {
-                    const newMsgs = JSON.parse(stored);
-                    if (newMsgs.length > lastMessageCount) {
-                        loadMessages();
-                        lastMessageCount = newMsgs.length;
-                    }
-                }
-            }
-        }, 2000);
-        
-        // Auto-resize textarea
-        document.addEventListener('DOMContentLoaded', () => {
-            const ta = document.getElementById('messageInput');
-            if (ta) {
-                ta.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-                });
-                ta.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                });
-            }
-            
-            // Set up action menu button listeners
-            document.getElementById('editAction').onclick = editSelectedMessage;
-            document.getElementById('deleteAction').onclick = deleteSelectedMessage;
-        });
-        
-        loadData();
-        checkSession();
+    <script type="module">
+        // Import additional Firestore query functions
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        window.getDocs = getDocs;
+        window.query = query;
+        window.where = where;
+        window.collection = collection;
+        // Re-declare necessary functions for global scope
+        window.startLongPress = startLongPress;
+        window.cancelLongPress = cancelLongPress;
+        window.playVoice = playVoice;
+        window.viewImage = viewImage;
+        // Ensure all functions are attached to window (already done above)
     </script>
 </body>
 </html>
