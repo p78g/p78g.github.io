@@ -302,6 +302,7 @@
             justify-content: center;
             cursor: pointer;
             font-size: 12px;
+            font-weight: bold;
         }
 
         .message.sent .play-btn {
@@ -333,13 +334,14 @@
         .message-actions {
             position: absolute;
             right: 0;
-            top: -20px;
+            top: -28px;
             background: #2a2a2a;
             border-radius: 8px;
             padding: 4px 8px;
             display: none;
             gap: 8px;
             z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
         .message:hover .message-actions {
@@ -361,24 +363,46 @@
             border: none;
             color: #9ca3af;
             cursor: pointer;
-            font-size: 12px;
-            padding: 2px 6px;
+            font-size: 13px;
+            padding: 4px 8px;
             width: auto;
+            font-weight: 500;
+            transition: all 0.2s;
         }
 
         .action-btn:hover {
-            color: white;
             background: none;
             transform: none;
         }
 
-        .edit-btn:hover { color: #25D366; }
-        .delete-btn:hover { color: #f87171; }
+        .edit-btn:hover { 
+            color: #25D366; 
+        }
+        
+        .delete-btn:hover { 
+            color: #f87171; 
+        }
 
+        /* Brighter Edited Indicator */
         .edited-indicator {
-            font-size: 0.65em;
-            opacity: 0.7;
+            font-size: 0.7em;
+            font-weight: 500;
             margin-left: 6px;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.15);
+            padding: 2px 6px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .message.sent .edited-indicator {
+            color: #c4b5fd;
+            background: rgba(196, 181, 253, 0.2);
+        }
+
+        .message.received .edited-indicator {
+            color: #a78bfa;
+            background: rgba(167, 139, 250, 0.15);
         }
 
         .message-time {
@@ -423,18 +447,27 @@
             gap: 8px;
         }
 
+        /* Clean Icon Buttons - No Emojis */
         .icon-btn {
             background: #2a2a2a;
             width: 40px;
-            padding: 10px;
+            height: 40px;
+            padding: 0;
             border-radius: 50%;
             cursor: pointer;
             font-size: 18px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: #9ca3af;
         }
 
         .icon-btn:hover {
             background: #3a3a3a;
+            color: #25D366;
             transform: none;
         }
 
@@ -491,6 +524,11 @@
             max-width: 400px;
         }
 
+        .modal-content h3 {
+            color: white;
+            margin-bottom: 16px;
+        }
+
         .modal-content textarea {
             width: 100%;
             padding: 12px;
@@ -500,11 +538,17 @@
             color: white;
             margin: 16px 0;
             font-family: inherit;
+            resize: vertical;
         }
 
         .modal-buttons {
             display: flex;
             gap: 12px;
+        }
+
+        .modal-buttons button {
+            width: auto;
+            padding: 10px 20px;
         }
 
         /* Image Modal */
@@ -519,11 +563,13 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
 
         .image-modal img {
             max-width: 90%;
             max-height: 90%;
+            border-radius: 8px;
         }
 
         @media (max-width: 768px) {
@@ -533,6 +579,9 @@
             }
             .message-bubble {
                 max-width: 85%;
+            }
+            .message-actions {
+                top: -32px;
             }
         }
     </style>
@@ -597,8 +646,8 @@
             <div class="messages-container" id="messagesContainer"></div>
             <div class="message-input-container">
                 <div class="input-buttons">
-                    <div class="icon-btn" onclick="document.getElementById('imageInput').click()">📷</div>
-                    <div class="icon-btn" onclick="startVoiceRecording()">🎤</div>
+                    <div class="icon-btn" onclick="document.getElementById('imageInput').click()">📎</div>
+                    <div class="icon-btn" onclick="startVoiceRecording()">🎙</div>
                 </div>
                 <textarea class="message-input" id="messageInput" rows="1" placeholder="Type a message..."></textarea>
                 <button onclick="sendMessage()" class="send-btn">Send</button>
@@ -611,7 +660,7 @@
     <!-- Edit Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <h3 style="color: white;">Edit Message</h3>
+            <h3>Edit Message</h3>
             <textarea id="editText" rows="3"></textarea>
             <div class="modal-buttons">
                 <button onclick="saveEdit()">Save</button>
@@ -642,6 +691,7 @@
                 if (permission === "granted") {
                     localStorage.setItem('shadowchat_notifications', 'granted');
                     document.getElementById('notificationBanner').style.display = 'none';
+                    showSuccess("Notifications enabled");
                 }
             });
         }
@@ -675,7 +725,9 @@
                 
                 mediaRecorder.start();
                 isRecording = true;
-                document.querySelector('.icon-btn[onclick="startVoiceRecording()"]').style.background = '#f87171';
+                const micBtn = document.querySelector('.icon-btn[onclick="startVoiceRecording()"]');
+                micBtn.style.background = '#f87171';
+                micBtn.style.color = 'white';
                 showSuccess("Recording... Click again to stop");
                 
                 setTimeout(() => {
@@ -690,7 +742,9 @@
             if (mediaRecorder && isRecording) {
                 mediaRecorder.stop();
                 isRecording = false;
-                document.querySelector('.icon-btn[onclick="startVoiceRecording()"]').style.background = '#2a2a2a';
+                const micBtn = document.querySelector('.icon-btn[onclick="startVoiceRecording()"]');
+                micBtn.style.background = '#2a2a2a';
+                micBtn.style.color = '#9ca3af';
             }
         }
         
@@ -927,7 +981,7 @@
                     contentHtml = `<div class="message-content">${escapeHtml(msg.content)}</div>`;
                 }
                 
-                const editedHtml = msg.edited ? '<span class="edited-indicator">(edited)</span>' : '';
+                const editedHtml = msg.edited ? '<span class="edited-indicator">edited</span>' : '';
                 
                 return `
                     <div class="message ${isSent ? 'sent' : 'received'}">
@@ -938,8 +992,8 @@
                         </div>
                         ${isSent ? `
                             <div class="message-actions">
-                                <button class="action-btn edit-btn" onclick="editMessage(${msg.id})">✏️</button>
-                                <button class="action-btn delete-btn" onclick="deleteMessage(${msg.id})">🗑️</button>
+                                <button class="action-btn edit-btn" onclick="editMessage(${msg.id})">Edit</button>
+                                <button class="action-btn delete-btn" onclick="deleteMessage(${msg.id})">Delete</button>
                             </div>
                         ` : ''}
                     </div>
