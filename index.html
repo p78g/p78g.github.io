@@ -92,10 +92,6 @@
             background: #2f2f2f;
         }
 
-        .input-group input::placeholder {
-            color: #6b7280;
-        }
-
         button {
             background: #25D366;
             color: white;
@@ -127,33 +123,27 @@
             font-weight: 500;
         }
 
-        .switch-auth a:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            color: #f87171;
-            background: rgba(248, 113, 113, 0.1);
+        .error-message, .success-message {
             padding: 12px;
             border-radius: 12px;
             margin-bottom: 20px;
             display: none;
             font-size: 0.9em;
+        }
+
+        .error-message {
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
             border: 1px solid rgba(248, 113, 113, 0.2);
         }
 
         .success-message {
             color: #4ade80;
             background: rgba(74, 222, 128, 0.1);
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 0.9em;
             border: 1px solid rgba(74, 222, 128, 0.2);
         }
 
-        /* Notification Permission Banner */
+        /* Notification Banner */
         .notification-banner {
             background: rgba(37, 211, 102, 0.1);
             border: 1px solid rgba(37, 211, 102, 0.3);
@@ -176,10 +166,9 @@
             background: rgba(37, 211, 102, 0.2);
             padding: 6px 16px;
             width: auto;
-            font-size: 0.85em;
         }
 
-        /* Main App - WhatsApp Style */
+        /* Main App */
         .app-container {
             display: none;
             flex-direction: column;
@@ -187,7 +176,6 @@
             background: #0a0a0a;
         }
 
-        /* Header - WhatsApp Style */
         .header {
             background: #1a1a1a;
             padding: 16px 20px;
@@ -195,18 +183,6 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #2a2a2a;
-        }
-
-        .header h2 {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
         }
 
         .user-info {
@@ -219,7 +195,6 @@
         .username-display {
             color: #25D366;
             font-weight: 600;
-            font-size: 0.95em;
             background: rgba(37, 211, 102, 0.1);
             padding: 6px 12px;
             border-radius: 20px;
@@ -229,15 +204,9 @@
             background: rgba(255, 255, 255, 0.05);
             padding: 6px 16px;
             width: auto;
-            font-weight: 500;
         }
 
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: none;
-        }
-
-        /* Messages Container - WhatsApp Style */
+        /* Messages Container */
         .messages-container {
             flex: 1;
             overflow-y: auto;
@@ -247,11 +216,12 @@
             flex-direction: column;
         }
 
-        /* Message Bubbles - WhatsApp Style */
+        /* Message Bubbles */
         .message {
             display: flex;
             margin-bottom: 12px;
             animation: fadeIn 0.2s ease;
+            position: relative;
         }
 
         .message.sent {
@@ -305,6 +275,112 @@
             word-break: break-word;
         }
 
+        /* Image Styling */
+        .message-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        /* Voice Message Styling */
+        .voice-message {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 200px;
+        }
+
+        .play-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .message.sent .play-btn {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .voice-timeline {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .voice-progress {
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            width: 0%;
+        }
+
+        .voice-duration {
+            font-size: 0.7em;
+            min-width: 35px;
+        }
+
+        /* Message Actions */
+        .message-actions {
+            position: absolute;
+            right: 0;
+            top: -20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 4px 8px;
+            display: none;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .message:hover .message-actions {
+            display: flex;
+        }
+
+        .message.sent .message-actions {
+            right: 0;
+            left: auto;
+        }
+
+        .message.received .message-actions {
+            left: 0;
+            right: auto;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 2px 6px;
+            width: auto;
+        }
+
+        .action-btn:hover {
+            color: white;
+            background: none;
+            transform: none;
+        }
+
+        .edit-btn:hover { color: #25D366; }
+        .delete-btn:hover { color: #f87171; }
+
+        .edited-indicator {
+            font-size: 0.65em;
+            opacity: 0.7;
+            margin-left: 6px;
+        }
+
         .message-time {
             font-size: 0.65em;
             margin-top: 4px;
@@ -332,7 +408,7 @@
             }
         }
 
-        /* Input Area - WhatsApp Style */
+        /* Input Area */
         .message-input-container {
             padding: 16px 20px;
             background: #1a1a1a;
@@ -340,6 +416,26 @@
             display: flex;
             gap: 12px;
             align-items: flex-end;
+        }
+
+        .input-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: #2a2a2a;
+            width: 40px;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .icon-btn:hover {
+            background: #3a3a3a;
+            transform: none;
         }
 
         .message-input {
@@ -358,11 +454,6 @@
         .message-input:focus {
             outline: none;
             border-color: #25D366;
-            background: #2f2f2f;
-        }
-
-        .message-input::placeholder {
-            color: #6b7280;
         }
 
         .send-btn {
@@ -370,28 +461,69 @@
             padding: 12px 24px;
             width: auto;
             border-radius: 24px;
-            font-weight: 600;
         }
 
         .empty-messages {
             text-align: center;
             color: #6b7280;
             padding: 60px 20px;
-            font-size: 0.9em;
         }
 
-        /* Scrollbar */
-        .messages-container::-webkit-scrollbar {
-            width: 6px;
+        /* Modal for editing */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
 
-        .messages-container::-webkit-scrollbar-track {
+        .modal-content {
             background: #1a1a1a;
+            padding: 24px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
         }
 
-        .messages-container::-webkit-scrollbar-thumb {
-            background: #3a3a3a;
-            border-radius: 3px;
+        .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            color: white;
+            margin: 16px 0;
+            font-family: inherit;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Image Modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
         }
 
         @media (max-width: 768px) {
@@ -399,41 +531,33 @@
                 height: 100vh;
                 border-radius: 0;
             }
-            
             .message-bubble {
                 max-width: 85%;
-            }
-
-            .auth-container {
-                padding: 24px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Authentication Section -->
+        <!-- Auth Section -->
         <div id="authSection" class="auth-container">
             <div class="auth-form">
-                <h1 class="visually-hidden">ShadowChat - Private Messaging Platform</h1>
-                
-                <!-- Notification Permission Banner -->
+                <h1 class="visually-hidden">ShadowChat</h1>
                 <div id="notificationBanner" class="notification-banner" style="display: none;">
-                    <span>🔔 Enable notifications to get alerts for new messages</span>
+                    <span>🔔 Enable notifications</span>
                     <button onclick="requestNotificationPermission()" class="enable-notif-btn">Enable</button>
                 </div>
-                
                 <div id="errorMessage" class="error-message"></div>
                 <div id="successMessage" class="success-message"></div>
                 
                 <div id="loginForm">
                     <div class="input-group">
                         <label>Username</label>
-                        <input type="text" id="loginUsername" placeholder="Enter your username">
+                        <input type="text" id="loginUsername" placeholder="Enter username">
                     </div>
                     <div class="input-group">
                         <label>Password</label>
-                        <input type="password" id="loginPassword" placeholder="Enter your password">
+                        <input type="password" id="loginPassword" placeholder="Enter password">
                     </div>
                     <button onclick="login()">Sign In</button>
                     <div class="switch-auth">
@@ -444,15 +568,15 @@
                 <div id="registerForm" style="display:none;">
                     <div class="input-group">
                         <label>Username</label>
-                        <input type="text" id="registerUsername" placeholder="Choose a username">
+                        <input type="text" id="registerUsername" placeholder="Choose username">
                     </div>
                     <div class="input-group">
                         <label>Password</label>
-                        <input type="password" id="registerPassword" placeholder="Choose a password">
+                        <input type="password" id="registerPassword" placeholder="Choose password">
                     </div>
                     <div class="input-group">
                         <label>Confirm Password</label>
-                        <input type="password" id="confirmPassword" placeholder="Confirm your password">
+                        <input type="password" id="confirmPassword" placeholder="Confirm password">
                     </div>
                     <button onclick="register()">Create Account</button>
                     <div class="switch-auth">
@@ -462,384 +586,418 @@
             </div>
         </div>
 
-        <!-- Main App Section -->
+        <!-- Main App -->
         <div id="appSection" class="app-container">
             <div class="header">
-                <h2>ShadowChat</h2>
                 <div class="user-info">
                     <span class="username-display" id="currentUsername"></span>
                     <button onclick="logout()" class="logout-btn">Exit</button>
                 </div>
             </div>
-            <div class="messages-container" id="messagesContainer">
-                <div class="empty-messages">No messages yet. Start the conversation!</div>
-            </div>
+            <div class="messages-container" id="messagesContainer"></div>
             <div class="message-input-container">
+                <div class="input-buttons">
+                    <div class="icon-btn" onclick="document.getElementById('imageInput').click()">📷</div>
+                    <div class="icon-btn" onclick="startVoiceRecording()">🎤</div>
+                </div>
                 <textarea class="message-input" id="messageInput" rows="1" placeholder="Type a message..."></textarea>
                 <button onclick="sendMessage()" class="send-btn">Send</button>
             </div>
         </div>
     </div>
 
+    <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: white;">Edit Message</h3>
+            <textarea id="editText" rows="3"></textarea>
+            <div class="modal-buttons">
+                <button onclick="saveEdit()">Save</button>
+                <button onclick="closeEditModal()" style="background: #3a3a3a;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <img id="modalImage" src="">
+    </div>
+
     <script>
-        // Data storage
         let users = {};
         let messages = [];
         let currentUser = null;
         let lastMessageCount = 0;
-        let notificationPermission = false;
+        let editingMessageId = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
 
-        // Notification System - ENABLE THIS!
-        function checkNotificationSupport() {
-            if (!("Notification" in window)) {
-                console.log("This browser does not support notifications");
-                return false;
-            }
-            return true;
-        }
-
-        // HOW TO ENABLE NOTIFICATIONS:
-        // 1. Click the "Enable" button in the purple/green banner
-        // 2. Click "Allow" when the browser popup appears
-        // 3. That's it! You'll get notifications for new messages
+        // Notification System
         function requestNotificationPermission() {
-            if (!checkNotificationSupport()) {
-                showError("Your browser doesn't support notifications");
-                return;
-            }
-
-            Notification.requestPermission().then(function(permission) {
+            if (!("Notification" in window)) return;
+            Notification.requestPermission().then(permission => {
                 if (permission === "granted") {
-                    notificationPermission = true;
                     localStorage.setItem('shadowchat_notifications', 'granted');
                     document.getElementById('notificationBanner').style.display = 'none';
-                    showSuccess("✓ Notifications enabled!");
-                    
-                    // Test notification
-                    new Notification("ShadowChat", {
-                        body: "You'll now receive alerts for new messages",
-                        icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2325D366'%3E%3Cpath d='M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E"
-                    });
-                } else {
-                    showError("Notifications blocked. Enable in browser settings.");
                 }
             });
         }
 
-        function sendNotification(sender, message) {
-            if (notificationPermission || Notification.permission === "granted") {
-                if (sender === currentUser) return;
+        // Voice Recording
+        async function startVoiceRecording() {
+            if (isRecording) {
+                stopVoiceRecording();
+                return;
+            }
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
                 
-                new Notification(`📨 ${sender}`, {
-                    body: message.length > 50 ? message.substring(0, 47) + "..." : message,
-                    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2325D366'%3E%3Cpath d='M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E",
-                    silent: false,
-                    vibrate: [200, 100, 200]
-                });
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const audioData = reader.result;
+                        sendVoiceMessage(audioData);
+                    };
+                    reader.readAsDataURL(audioBlob);
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                document.querySelector('.icon-btn[onclick="startVoiceRecording()"]').style.background = '#f87171';
+                showSuccess("Recording... Click again to stop");
+                
+                setTimeout(() => {
+                    if (isRecording) stopVoiceRecording();
+                }, 60000);
+            } catch (err) {
+                showError("Microphone access denied");
             }
         }
-
-        // Load data from localStorage
+        
+        function stopVoiceRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                document.querySelector('.icon-btn[onclick="startVoiceRecording()"]').style.background = '#2a2a2a';
+            }
+        }
+        
+        function sendVoiceMessage(audioData) {
+            if (!currentUser) return;
+            const newMessage = {
+                id: Date.now(),
+                sender: currentUser,
+                type: 'voice',
+                content: audioData,
+                timestamp: new Date().toISOString(),
+                edited: false
+            };
+            messages.push(newMessage);
+            saveMessages();
+            loadMessages();
+        }
+        
+        // Image Upload
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    sendImageMessage(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+            input.value = '';
+        }
+        
+        function sendImageMessage(imageData) {
+            if (!currentUser) return;
+            const newMessage = {
+                id: Date.now(),
+                sender: currentUser,
+                type: 'image',
+                content: imageData,
+                timestamp: new Date().toISOString(),
+                edited: false
+            };
+            messages.push(newMessage);
+            saveMessages();
+            loadMessages();
+        }
+        
+        // Edit Message
+        function editMessage(id) {
+            const message = messages.find(m => m.id === id);
+            if (message && message.sender === currentUser) {
+                editingMessageId = id;
+                document.getElementById('editText').value = message.content;
+                document.getElementById('editModal').style.display = 'flex';
+            }
+        }
+        
+        function saveEdit() {
+            const newContent = document.getElementById('editText').value.trim();
+            if (newContent && editingMessageId) {
+                const messageIndex = messages.findIndex(m => m.id === editingMessageId);
+                if (messageIndex !== -1 && messages[messageIndex].sender === currentUser) {
+                    messages[messageIndex].content = newContent;
+                    messages[messageIndex].edited = true;
+                    messages[messageIndex].editedAt = new Date().toISOString();
+                    saveMessages();
+                    loadMessages();
+                }
+            }
+            closeEditModal();
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            editingMessageId = null;
+        }
+        
+        // Delete Message
+        function deleteMessage(id) {
+            if (confirm("Delete this message?")) {
+                const messageIndex = messages.findIndex(m => m.id === id);
+                if (messageIndex !== -1 && messages[messageIndex].sender === currentUser) {
+                    messages.splice(messageIndex, 1);
+                    saveMessages();
+                    loadMessages();
+                }
+            }
+        }
+        
+        // Play Voice Message
+        function playVoice(audioData, button) {
+            const audio = new Audio(audioData);
+            audio.play();
+            button.textContent = '⏸';
+            audio.onended = () => {
+                button.textContent = '▶';
+            };
+        }
+        
+        // View Image
+        function viewImage(imageData) {
+            document.getElementById('modalImage').src = imageData;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+        
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        // Core Functions
         function loadData() {
             const storedUsers = localStorage.getItem('shadowchat_users');
             const storedMessages = localStorage.getItem('shadowchat_messages');
-            const storedNotifPref = localStorage.getItem('shadowchat_notifications');
-            
-            if (storedUsers) {
-                users = JSON.parse(storedUsers);
-            } else {
-                users = {};
-                saveUsers();
-            }
-            
+            if (storedUsers) users = JSON.parse(storedUsers);
+            else users = {};
             if (storedMessages) {
                 messages = JSON.parse(storedMessages);
                 lastMessageCount = messages.length;
-            } else {
-                messages = [];
-                lastMessageCount = 0;
-                saveMessages();
-            }
+            } else messages = [];
             
-            if (storedNotifPref === 'granted' && Notification.permission === "granted") {
-                notificationPermission = true;
-            } else if (Notification.permission === "granted") {
-                notificationPermission = true;
-                localStorage.setItem('shadowchat_notifications', 'granted');
-            } else if (Notification.permission === "default") {
+            if (Notification.permission === "default") {
                 document.getElementById('notificationBanner').style.display = 'flex';
             }
         }
-
+        
         function saveUsers() {
             localStorage.setItem('shadowchat_users', JSON.stringify(users));
         }
-
+        
         function saveMessages() {
             localStorage.setItem('shadowchat_messages', JSON.stringify(messages));
+            lastMessageCount = messages.length;
         }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 3000);
+        
+        function showError(msg) {
+            const div = document.getElementById('errorMessage');
+            div.textContent = msg;
+            div.style.display = 'block';
+            setTimeout(() => div.style.display = 'none', 3000);
         }
-
-        function showSuccess(message) {
-            const successDiv = document.getElementById('successMessage');
-            successDiv.textContent = message;
-            successDiv.style.display = 'block';
-            setTimeout(() => {
-                successDiv.style.display = 'none';
-            }, 3000);
+        
+        function showSuccess(msg) {
+            const div = document.getElementById('successMessage');
+            div.textContent = msg;
+            div.style.display = 'block';
+            setTimeout(() => div.style.display = 'none', 3000);
         }
-
+        
         function showRegister() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
         }
-
+        
         function showLogin() {
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
         }
-
+        
         function register() {
             const username = document.getElementById('registerUsername').value.trim();
             const password = document.getElementById('registerPassword').value;
             const confirm = document.getElementById('confirmPassword').value;
-
-            if (!username || !password) {
-                showError('Please fill in all fields');
-                return;
-            }
-
-            if (username.length < 3) {
-                showError('Username must be at least 3 characters');
-                return;
-            }
-
-            if (password.length < 4) {
-                showError('Password must be at least 4 characters');
-                return;
-            }
-
-            if (password !== confirm) {
-                showError('Passwords do not match');
-                return;
-            }
-
-            if (users[username]) {
-                showError('Username already exists');
-                return;
-            }
-
-            users[username] = {
-                username: username,
-                password: btoa(password),
-                createdAt: new Date().toISOString()
-            };
+            if (!username || !password) return showError('Fill all fields');
+            if (password !== confirm) return showError('Passwords dont match');
+            if (users[username]) return showError('Username exists');
+            users[username] = { username, password: btoa(password), createdAt: new Date().toISOString() };
             saveUsers();
-
-            showSuccess('Account created successfully!');
-            setTimeout(() => {
-                showLogin();
-                document.getElementById('registerUsername').value = '';
-                document.getElementById('registerPassword').value = '';
-                document.getElementById('confirmPassword').value = '';
-            }, 1500);
+            showSuccess('Account created!');
+            setTimeout(() => showLogin(), 1500);
         }
-
+        
         function login() {
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
-
-            if (!username || !password) {
-                showError('Please enter username and password');
-                return;
-            }
-
             const user = users[username];
-            if (!user || user.password !== btoa(password)) {
-                showError('Invalid username or password');
-                return;
-            }
-
+            if (!user || user.password !== btoa(password)) return showError('Invalid credentials');
             currentUser = username;
             localStorage.setItem('shadowchat_currentUser', currentUser);
-            
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('appSection').style.display = 'flex';
             document.getElementById('currentUsername').textContent = currentUser;
-            
-            const storedMessages = localStorage.getItem('shadowchat_messages');
-            if (storedMessages) {
-                messages = JSON.parse(storedMessages);
-                lastMessageCount = messages.length;
-            }
-            
             loadMessages();
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
         }
-
+        
         function logout() {
             currentUser = null;
             localStorage.removeItem('shadowchat_currentUser');
             document.getElementById('authSection').style.display = 'flex';
             document.getElementById('appSection').style.display = 'none';
-            document.getElementById('messagesContainer').innerHTML = '<div class="empty-messages">No messages yet. Start the conversation!</div>';
         }
-
+        
         function sendMessage() {
-            if (!currentUser) return;
-            
-            const messageInput = document.getElementById('messageInput');
-            const content = messageInput.value.trim();
-            
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
             if (!content) return;
-
             const newMessage = {
                 id: Date.now(),
                 sender: currentUser,
+                type: 'text',
                 content: content,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                edited: false
             };
-            
             messages.push(newMessage);
             saveMessages();
-            lastMessageCount = messages.length;
-            
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
+            input.value = '';
+            input.style.height = 'auto';
             loadMessages();
         }
-
+        
         function loadMessages() {
             const container = document.getElementById('messagesContainer');
-            
-            const storedMessages = localStorage.getItem('shadowchat_messages');
-            if (storedMessages) {
-                messages = JSON.parse(storedMessages);
-            }
-            
-            if (!messages || messages.length === 0) {
-                container.innerHTML = '<div class="empty-messages">No messages yet. Start the conversation!</div>';
+            const stored = localStorage.getItem('shadowchat_messages');
+            if (stored) messages = JSON.parse(stored);
+            if (!messages.length) {
+                container.innerHTML = '<div class="empty-messages">No messages yet</div>';
                 return;
             }
             
-            const sortedMessages = [...messages].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-            
-            container.innerHTML = sortedMessages.map(message => {
-                const isSent = message.sender === currentUser;
+            const sorted = [...messages].sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+            container.innerHTML = sorted.map(msg => {
+                const isSent = msg.sender === currentUser;
+                let contentHtml = '';
+                
+                if (msg.type === 'image') {
+                    contentHtml = `<img src="${msg.content}" class="message-image" onclick="viewImage('${msg.content}')">`;
+                } else if (msg.type === 'voice') {
+                    contentHtml = `
+                        <div class="voice-message">
+                            <div class="play-btn" onclick="playVoice('${msg.content}', this)">▶</div>
+                            <div class="voice-duration">Voice note</div>
+                        </div>
+                    `;
+                } else {
+                    contentHtml = `<div class="message-content">${escapeHtml(msg.content)}</div>`;
+                }
+                
+                const editedHtml = msg.edited ? '<span class="edited-indicator">(edited)</span>' : '';
+                
                 return `
                     <div class="message ${isSent ? 'sent' : 'received'}">
                         <div class="message-bubble">
-                            <span class="message-sender">${escapeHtml(message.sender)}</span>
-                            <div class="message-content">${escapeHtml(message.content)}</div>
-                            <span class="message-time">${formatTime(message.timestamp)}</span>
+                            <span class="message-sender">${escapeHtml(msg.sender)}</span>
+                            ${contentHtml}
+                            <span class="message-time">${formatTime(msg.timestamp)}${editedHtml}</span>
                         </div>
+                        ${isSent ? `
+                            <div class="message-actions">
+                                <button class="action-btn edit-btn" onclick="editMessage(${msg.id})">✏️</button>
+                                <button class="action-btn delete-btn" onclick="deleteMessage(${msg.id})">🗑️</button>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }).join('');
-            
             container.scrollTop = container.scrollHeight;
         }
-
-        function formatTime(timestamp) {
-            const date = new Date(timestamp);
+        
+        function formatTime(ts) {
+            const date = new Date(ts);
             const now = new Date();
             const diff = now - date;
-            
             if (diff < 60000) return 'now';
-            if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
-            if (diff < 86400000) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            if (diff < 3600000) return `${Math.floor(diff/60000)}m`;
+            if (diff < 86400000) return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            return date.toLocaleDateString([], {month:'short', day:'numeric'});
         }
-
+        
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-
+        
         function checkSession() {
-            const savedUser = localStorage.getItem('shadowchat_currentUser');
-            if (savedUser && users[savedUser]) {
-                currentUser = savedUser;
+            const saved = localStorage.getItem('shadowchat_currentUser');
+            if (saved && users[saved]) {
+                currentUser = saved;
                 document.getElementById('authSection').style.display = 'none';
                 document.getElementById('appSection').style.display = 'flex';
                 document.getElementById('currentUsername').textContent = currentUser;
-                
-                const storedMessages = localStorage.getItem('shadowchat_messages');
-                if (storedMessages) {
-                    messages = JSON.parse(storedMessages);
-                    lastMessageCount = messages.length;
-                }
                 loadMessages();
             }
         }
-
-        // Auto-refresh with notifications
-        let refreshInterval = null;
         
-        function startAutoRefresh() {
-            if (refreshInterval) clearInterval(refreshInterval);
-            refreshInterval = setInterval(() => {
-                if (currentUser) {
-                    const storedMessages = localStorage.getItem('shadowchat_messages');
-                    if (storedMessages) {
-                        const newMessages = JSON.parse(storedMessages);
-                        
-                        if (newMessages.length > lastMessageCount) {
-                            const newMessagesList = newMessages.slice(lastMessageCount);
-                            newMessagesList.forEach(msg => {
-                                if (msg.sender !== currentUser) {
-                                    sendNotification(msg.sender, msg.content);
-                                }
-                            });
-                            messages = newMessages;
-                            lastMessageCount = messages.length;
-                            loadMessages();
-                        } else if (JSON.stringify(messages) !== JSON.stringify(newMessages)) {
-                            messages = newMessages;
-                            lastMessageCount = messages.length;
-                            loadMessages();
-                        }
+        // Auto-refresh
+        setInterval(() => {
+            if (currentUser) {
+                const stored = localStorage.getItem('shadowchat_messages');
+                if (stored) {
+                    const newMsgs = JSON.parse(stored);
+                    if (newMsgs.length > lastMessageCount) {
+                        loadMessages();
+                        lastMessageCount = newMsgs.length;
                     }
                 }
-            }, 2000);
-        }
-
+            }
+        }, 2000);
+        
         // Auto-resize textarea
-        function autoResizeTextarea() {
-            const textarea = document.getElementById('messageInput');
-            if (textarea) {
-                textarea.addEventListener('input', function() {
+        document.addEventListener('DOMContentLoaded', () => {
+            const ta = document.getElementById('messageInput');
+            if (ta) {
+                ta.addEventListener('input', function() {
                     this.style.height = 'auto';
                     this.style.height = Math.min(this.scrollHeight, 100) + 'px';
                 });
-            }
-        }
-
-        // Initialize
-        loadData();
-        checkSession();
-        startAutoRefresh();
-        autoResizeTextarea();
-
-        // Enter to send
-        document.addEventListener('DOMContentLoaded', () => {
-            const messageInput = document.getElementById('messageInput');
-            if (messageInput) {
-                messageInput.addEventListener('keypress', (e) => {
+                ta.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         sendMessage();
@@ -847,6 +1005,9 @@
                 });
             }
         });
+        
+        loadData();
+        checkSession();
     </script>
 </body>
 </html>
