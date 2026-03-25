@@ -9,6 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -216,12 +217,18 @@
             flex-direction: column;
         }
 
-        /* Message Bubbles */
+        /* Message Bubbles - Tap to edit/delete */
         .message {
             display: flex;
             margin-bottom: 12px;
             animation: fadeIn 0.2s ease;
             position: relative;
+            cursor: pointer;
+            transition: opacity 0.1s;
+        }
+
+        .message:active {
+            opacity: 0.7;
         }
 
         .message.sent {
@@ -238,6 +245,7 @@
             border-radius: 18px;
             position: relative;
             word-wrap: break-word;
+            pointer-events: none;
         }
 
         .message.sent .message-bubble {
@@ -275,6 +283,58 @@
             word-break: break-word;
         }
 
+        /* Link Embed Styling */
+        .link-embed {
+            margin-top: 8px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .embed-video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+        }
+
+        .embed-video iframe {
+            width: 100%;
+            height: 225px;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .embed-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .embed-favicon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+
+        .embed-info {
+            flex: 1;
+        }
+
+        .embed-url {
+            font-size: 0.7em;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .embed-title {
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
         /* Image Styling */
         .message-image {
             max-width: 100%;
@@ -282,6 +342,7 @@
             border-radius: 12px;
             cursor: pointer;
             margin-top: 4px;
+            pointer-events: auto;
         }
 
         /* Voice Message Styling */
@@ -303,87 +364,13 @@
             cursor: pointer;
             font-size: 12px;
             font-weight: bold;
+            pointer-events: auto;
         }
 
         .message.sent .play-btn {
             background: rgba(0, 0, 0, 0.2);
         }
 
-        .voice-timeline {
-            flex: 1;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .voice-progress {
-            height: 100%;
-            background: white;
-            border-radius: 2px;
-            width: 0%;
-        }
-
-        .voice-duration {
-            font-size: 0.7em;
-            min-width: 35px;
-        }
-
-        /* Message Actions */
-        .message-actions {
-            position: absolute;
-            right: 0;
-            top: -28px;
-            background: #2a2a2a;
-            border-radius: 8px;
-            padding: 4px 8px;
-            display: none;
-            gap: 8px;
-            z-index: 10;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        .message:hover .message-actions {
-            display: flex;
-        }
-
-        .message.sent .message-actions {
-            right: 0;
-            left: auto;
-        }
-
-        .message.received .message-actions {
-            left: 0;
-            right: auto;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: #9ca3af;
-            cursor: pointer;
-            font-size: 13px;
-            padding: 4px 8px;
-            width: auto;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .action-btn:hover {
-            background: none;
-            transform: none;
-        }
-
-        .edit-btn:hover { 
-            color: #25D366; 
-        }
-        
-        .delete-btn:hover { 
-            color: #f87171; 
-        }
-
-        /* Brighter Edited Indicator */
         .edited-indicator {
             font-size: 0.7em;
             font-weight: 500;
@@ -395,16 +382,6 @@
             display: inline-block;
         }
 
-        .message.sent .edited-indicator {
-            color: #c4b5fd;
-            background: rgba(196, 181, 253, 0.2);
-        }
-
-        .message.received .edited-indicator {
-            color: #a78bfa;
-            background: rgba(167, 139, 250, 0.15);
-        }
-
         .message-time {
             font-size: 0.65em;
             margin-top: 4px;
@@ -413,12 +390,63 @@
             opacity: 0.7;
         }
 
-        .message.sent .message-time {
-            color: rgba(255, 255, 255, 0.8);
+        /* Action Menu Popup */
+        .action-menu {
+            position: fixed;
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            min-width: 140px;
+            animation: menuFadeIn 0.15s ease;
         }
 
-        .message.received .message-time {
-            color: #6b7280;
+        @keyframes menuFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .action-menu-item {
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            color: #e5e7eb;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.1s;
+            width: 100%;
+        }
+
+        .action-menu-item:hover {
+            background: #3a3a3a;
+            transform: none;
+        }
+
+        .action-menu-item.delete {
+            color: #f87171;
+        }
+
+        .action-menu-item.delete:hover {
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        .action-menu-divider {
+            height: 1px;
+            background: #3a3a3a;
+            margin: 4px 0;
         }
 
         @keyframes fadeIn {
@@ -447,7 +475,7 @@
             gap: 8px;
         }
 
-        /* Clean Icon Buttons - No Emojis */
+        /* Clean SVG Icons */
         .icon-btn {
             background: #2a2a2a;
             width: 40px;
@@ -455,20 +483,31 @@
             padding: 0;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 18px;
-            text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 500;
             transition: all 0.2s;
-            color: #9ca3af;
+            border: none;
         }
 
-        .icon-btn:hover {
-            background: #3a3a3a;
-            color: #25D366;
-            transform: none;
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: #9ca3af;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .icon-btn:hover svg {
+            stroke: #25D366;
+        }
+
+        .icon-btn.active {
+            background: #f87171;
+        }
+
+        .icon-btn.active svg {
+            stroke: white;
         }
 
         .message-input {
@@ -511,7 +550,7 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
+            z-index: 2000;
             align-items: center;
             justify-content: center;
         }
@@ -560,7 +599,7 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
+            z-index: 2000;
             align-items: center;
             justify-content: center;
             cursor: pointer;
@@ -580,9 +619,6 @@
             .message-bubble {
                 max-width: 85%;
             }
-            .message-actions {
-                top: -32px;
-            }
         }
     </style>
 </head>
@@ -593,7 +629,7 @@
             <div class="auth-form">
                 <h1 class="visually-hidden">ShadowChat</h1>
                 <div id="notificationBanner" class="notification-banner" style="display: none;">
-                    <span>🔔 Enable notifications</span>
+                    <span>Enable notifications</span>
                     <button onclick="requestNotificationPermission()" class="enable-notif-btn">Enable</button>
                 </div>
                 <div id="errorMessage" class="error-message"></div>
@@ -646,8 +682,20 @@
             <div class="messages-container" id="messagesContainer"></div>
             <div class="message-input-container">
                 <div class="input-buttons">
-                    <div class="icon-btn" onclick="document.getElementById('imageInput').click()">📎</div>
-                    <div class="icon-btn" onclick="startVoiceRecording()">🎙</div>
+                    <button class="icon-btn" onclick="document.getElementById('imageInput').click()">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+                            <circle cx="8.5" cy="8.5" r="2.5" />
+                            <path d="M21 15l-5-4-3 3-4-4-5 5" />
+                        </svg>
+                    </button>
+                    <button class="icon-btn" id="micBtn" onclick="startVoiceRecording()">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z" />
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                            <line x1="12" y1="19" x2="12" y2="22" />
+                        </svg>
+                    </button>
                 </div>
                 <textarea class="message-input" id="messageInput" rows="1" placeholder="Type a message..."></textarea>
                 <button onclick="sendMessage()" class="send-btn">Send</button>
@@ -656,6 +704,13 @@
     </div>
 
     <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
+
+    <!-- Action Menu Popup -->
+    <div id="actionMenu" class="action-menu">
+        <button class="action-menu-item" id="editAction">Edit</button>
+        <div class="action-menu-divider"></div>
+        <button class="action-menu-item delete" id="deleteAction">Delete</button>
+    </div>
 
     <!-- Edit Modal -->
     <div id="editModal" class="modal">
@@ -683,6 +738,7 @@
         let mediaRecorder = null;
         let audioChunks = [];
         let isRecording = false;
+        let selectedMessageId = null;
 
         // Notification System
         function requestNotificationPermission() {
@@ -696,6 +752,58 @@
             });
         }
 
+        // Action Menu - Show on tap
+        function showActionMenu(messageId, event) {
+            const message = messages.find(m => m.id === messageId);
+            if (!message || message.sender !== currentUser) return;
+            
+            selectedMessageId = messageId;
+            const menu = document.getElementById('actionMenu');
+            
+            let x, y;
+            if (event.touches) {
+                x = event.touches[0].clientX;
+                y = event.touches[0].clientY;
+                event.preventDefault();
+            } else {
+                x = event.clientX;
+                y = event.clientY;
+            }
+            
+            menu.style.display = 'flex';
+            menu.style.left = x + 'px';
+            menu.style.top = (y - 60) + 'px';
+            
+            // Close menu when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', closeActionMenu);
+                document.addEventListener('touchstart', closeActionMenu);
+            }, 0);
+        }
+        
+        function closeActionMenu() {
+            document.getElementById('actionMenu').style.display = 'none';
+            selectedMessageId = null;
+            document.removeEventListener('click', closeActionMenu);
+            document.removeEventListener('touchstart', closeActionMenu);
+        }
+        
+        function editSelectedMessage() {
+            if (selectedMessageId) {
+                editMessage(selectedMessageId);
+                closeActionMenu();
+            }
+        }
+        
+        function deleteSelectedMessage() {
+            if (selectedMessageId) {
+                if (confirm("Delete this message?")) {
+                    deleteMessage(selectedMessageId);
+                }
+                closeActionMenu();
+            }
+        }
+        
         // Voice Recording
         async function startVoiceRecording() {
             if (isRecording) {
@@ -725,10 +833,9 @@
                 
                 mediaRecorder.start();
                 isRecording = true;
-                const micBtn = document.querySelector('.icon-btn[onclick="startVoiceRecording()"]');
-                micBtn.style.background = '#f87171';
-                micBtn.style.color = 'white';
-                showSuccess("Recording... Click again to stop");
+                const micBtn = document.getElementById('micBtn');
+                micBtn.classList.add('active');
+                showSuccess("Recording... Tap again to stop");
                 
                 setTimeout(() => {
                     if (isRecording) stopVoiceRecording();
@@ -742,9 +849,8 @@
             if (mediaRecorder && isRecording) {
                 mediaRecorder.stop();
                 isRecording = false;
-                const micBtn = document.querySelector('.icon-btn[onclick="startVoiceRecording()"]');
-                micBtn.style.background = '#2a2a2a';
-                micBtn.style.color = '#9ca3af';
+                const micBtn = document.getElementById('micBtn');
+                micBtn.classList.remove('active');
             }
         }
         
@@ -791,6 +897,53 @@
             loadMessages();
         }
         
+        // Detect and embed links
+        function detectAndEmbedLinks(text) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const urls = text.match(urlRegex);
+            
+            if (!urls) return { text, embeds: [] };
+            
+            let processedText = text;
+            const embeds = [];
+            
+            for (const url of urls) {
+                // Check for video platforms
+                if (url.includes('youtube.com/watch') || url.includes('youtu.be/')) {
+                    let videoId = '';
+                    if (url.includes('youtu.be/')) {
+                        videoId = url.split('youtu.be/')[1].split('?')[0];
+                    } else {
+                        videoId = url.split('v=')[1]?.split('&')[0];
+                    }
+                    if (videoId) {
+                        embeds.push({
+                            type: 'youtube',
+                            url: `https://www.youtube.com/embed/${videoId}`,
+                            originalUrl: url
+                        });
+                        processedText = processedText.replace(url, '');
+                    }
+                } else if (url.includes('vimeo.com/')) {
+                    const vimeoId = url.split('vimeo.com/')[1].split('?')[0];
+                    embeds.push({
+                        type: 'vimeo',
+                        url: `https://player.vimeo.com/video/${vimeoId}`,
+                        originalUrl: url
+                    });
+                    processedText = processedText.replace(url, '');
+                } else {
+                    embeds.push({
+                        type: 'link',
+                        url: url,
+                        originalUrl: url
+                    });
+                }
+            }
+            
+            return { text: processedText.trim(), embeds };
+        }
+        
         // Edit Message
         function editMessage(id) {
             const message = messages.find(m => m.id === id);
@@ -823,13 +976,11 @@
         
         // Delete Message
         function deleteMessage(id) {
-            if (confirm("Delete this message?")) {
-                const messageIndex = messages.findIndex(m => m.id === id);
-                if (messageIndex !== -1 && messages[messageIndex].sender === currentUser) {
-                    messages.splice(messageIndex, 1);
-                    saveMessages();
-                    loadMessages();
-                }
+            const messageIndex = messages.findIndex(m => m.id === id);
+            if (messageIndex !== -1 && messages[messageIndex].sender === currentUser) {
+                messages.splice(messageIndex, 1);
+                saveMessages();
+                loadMessages();
             }
         }
         
@@ -939,11 +1090,15 @@
             const input = document.getElementById('messageInput');
             const content = input.value.trim();
             if (!content) return;
+            
+            const { text, embeds } = detectAndEmbedLinks(content);
+            
             const newMessage = {
                 id: Date.now(),
                 sender: currentUser,
                 type: 'text',
-                content: content,
+                content: text,
+                embeds: embeds,
                 timestamp: new Date().toISOString(),
                 edited: false
             };
@@ -969,99 +1124,45 @@
                 let contentHtml = '';
                 
                 if (msg.type === 'image') {
-                    contentHtml = `<img src="${msg.content}" class="message-image" onclick="viewImage('${msg.content}')">`;
+                    contentHtml = `<img src="${msg.content}" class="message-image" onclick="viewImage('${msg.content}')" style="pointer-events: auto;">`;
                 } else if (msg.type === 'voice') {
                     contentHtml = `
                         <div class="voice-message">
-                            <div class="play-btn" onclick="playVoice('${msg.content}', this)">▶</div>
+                            <div class="play-btn" onclick="playVoice('${msg.content}', this)" style="pointer-events: auto;">▶</div>
                             <div class="voice-duration">Voice note</div>
                         </div>
                     `;
                 } else {
-                    contentHtml = `<div class="message-content">${escapeHtml(msg.content)}</div>`;
+                    let textContent = escapeHtml(msg.content);
+                    if (textContent === '') textContent = ' ';
+                    contentHtml = `<div class="message-content">${textContent}</div>`;
+                    
+                    // Add embeds
+                    if (msg.embeds && msg.embeds.length > 0) {
+                        msg.embeds.forEach(embed => {
+                            if (embed.type === 'youtube' || embed.type === 'vimeo') {
+                                contentHtml += `
+                                    <div class="link-embed">
+                                        <div class="embed-video">
+                                            <iframe src="${embed.url}" frameborder="0" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (embed.type === 'link') {
+                                contentHtml += `
+                                    <a href="${embed.url}" target="_blank" class="link-embed embed-link" style="pointer-events: auto;">
+                                        <div class="embed-info">
+                                            <div class="embed-url">${escapeHtml(embed.url)}</div>
+                                            <div class="embed-title">Open Link</div>
+                                        </div>
+                                    </a>
+                                `;
+                            }
+                        });
+                    }
                 }
                 
                 const editedHtml = msg.edited ? '<span class="edited-indicator">edited</span>' : '';
                 
                 return `
-                    <div class="message ${isSent ? 'sent' : 'received'}">
-                        <div class="message-bubble">
-                            <span class="message-sender">${escapeHtml(msg.sender)}</span>
-                            ${contentHtml}
-                            <span class="message-time">${formatTime(msg.timestamp)}${editedHtml}</span>
-                        </div>
-                        ${isSent ? `
-                            <div class="message-actions">
-                                <button class="action-btn edit-btn" onclick="editMessage(${msg.id})">Edit</button>
-                                <button class="action-btn delete-btn" onclick="deleteMessage(${msg.id})">Delete</button>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
-            container.scrollTop = container.scrollHeight;
-        }
-        
-        function formatTime(ts) {
-            const date = new Date(ts);
-            const now = new Date();
-            const diff = now - date;
-            if (diff < 60000) return 'now';
-            if (diff < 3600000) return `${Math.floor(diff/60000)}m`;
-            if (diff < 86400000) return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            return date.toLocaleDateString([], {month:'short', day:'numeric'});
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function checkSession() {
-            const saved = localStorage.getItem('shadowchat_currentUser');
-            if (saved && users[saved]) {
-                currentUser = saved;
-                document.getElementById('authSection').style.display = 'none';
-                document.getElementById('appSection').style.display = 'flex';
-                document.getElementById('currentUsername').textContent = currentUser;
-                loadMessages();
-            }
-        }
-        
-        // Auto-refresh
-        setInterval(() => {
-            if (currentUser) {
-                const stored = localStorage.getItem('shadowchat_messages');
-                if (stored) {
-                    const newMsgs = JSON.parse(stored);
-                    if (newMsgs.length > lastMessageCount) {
-                        loadMessages();
-                        lastMessageCount = newMsgs.length;
-                    }
-                }
-            }
-        }, 2000);
-        
-        // Auto-resize textarea
-        document.addEventListener('DOMContentLoaded', () => {
-            const ta = document.getElementById('messageInput');
-            if (ta) {
-                ta.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-                });
-                ta.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                });
-            }
-        });
-        
-        loadData();
-        checkSession();
-    </script>
-</body>
-</html>
+                    <div class="message ${isSent ? 'sent' :
