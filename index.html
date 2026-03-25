@@ -158,6 +158,14 @@
             font-size: 0.85em;
         }
 
+        .notification-banner svg {
+            width: 20px;
+            height: 20px;
+            stroke: #25D366;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
         .notification-banner span {
             color: #25D366;
             flex: 1;
@@ -224,7 +232,6 @@
             animation: fadeIn 0.2s ease;
             position: relative;
             cursor: pointer;
-            transition: opacity 0.1s;
         }
 
         .message:active {
@@ -312,16 +319,7 @@
             padding: 12px;
             text-decoration: none;
             color: inherit;
-        }
-
-        .embed-favicon {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-        }
-
-        .embed-info {
-            flex: 1;
+            pointer-events: auto;
         }
 
         .embed-url {
@@ -345,30 +343,45 @@
             pointer-events: auto;
         }
 
-        /* Voice Message Styling */
+        /* Voice Message Styling - SVG Play/Pause */
         .voice-message {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             min-width: 200px;
         }
 
         .play-btn {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
+            transition: all 0.2s;
             pointer-events: auto;
+            border: none;
+        }
+
+        .play-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
         }
 
         .message.sent .play-btn {
             background: rgba(0, 0, 0, 0.2);
+        }
+
+        .play-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .voice-duration {
+            font-size: 0.8em;
+            color: #9ca3af;
         }
 
         .edited-indicator {
@@ -629,6 +642,10 @@
             <div class="auth-form">
                 <h1 class="visually-hidden">ShadowChat</h1>
                 <div id="notificationBanner" class="notification-banner" style="display: none;">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
                     <span>Enable notifications</span>
                     <button onclick="requestNotificationPermission()" class="enable-notif-btn">Enable</button>
                 </div>
@@ -739,6 +756,7 @@
         let audioChunks = [];
         let isRecording = false;
         let selectedMessageId = null;
+        let currentAudio = null;
 
         // Notification System
         function requestNotificationPermission() {
@@ -752,7 +770,7 @@
             });
         }
 
-        // Action Menu - Show on tap
+        // Action Menu - Show on tap (single click)
         function showActionMenu(messageId, event) {
             const message = messages.find(m => m.id === messageId);
             if (!message || message.sender !== currentUser) return;
@@ -771,7 +789,7 @@
             }
             
             menu.style.display = 'flex';
-            menu.style.left = x + 'px';
+            menu.style.left = (x - 70) + 'px';
             menu.style.top = (y - 60) + 'px';
             
             // Close menu when clicking outside
@@ -804,7 +822,7 @@
             }
         }
         
-        // Voice Recording
+        // Voice Recording with SVG Play/Pause
         async function startVoiceRecording() {
             if (isRecording) {
                 stopVoiceRecording();
@@ -869,6 +887,39 @@
             loadMessages();
         }
         
+        // Play Voice with SVG toggle
+        function playVoice(audioData, btnElement) {
+            if (currentAudio && !currentAudio.paused) {
+                currentAudio.pause();
+                currentAudio = null;
+                updatePlayButtonIcon(btnElement, false);
+                return;
+            }
+            
+            const audio = new Audio(audioData);
+            currentAudio = audio;
+            updatePlayButtonIcon(btnElement, true);
+            
+            audio.play();
+            audio.onended = () => {
+                currentAudio = null;
+                updatePlayButtonIcon(btnElement, false);
+            };
+        }
+        
+        function updatePlayButtonIcon(btn, isPlaying) {
+            if (isPlaying) {
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+                    <rect x="6" y="4" width="4" height="16" />
+                    <rect x="14" y="4" width="4" height="16" />
+                </svg>`;
+            } else {
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>`;
+            }
+        }
+        
         // Image Upload
         function handleImageUpload(input) {
             const file = input.files[0];
@@ -908,7 +959,6 @@
             const embeds = [];
             
             for (const url of urls) {
-                // Check for video platforms
                 if (url.includes('youtube.com/watch') || url.includes('youtu.be/')) {
                     let videoId = '';
                     if (url.includes('youtu.be/')) {
@@ -924,7 +974,8 @@
                         });
                         processedText = processedText.replace(url, '');
                     }
-                } else if (url.includes('vimeo.com/')) {
+                } 
+                else if (url.includes('vimeo.com/')) {
                     const vimeoId = url.split('vimeo.com/')[1].split('?')[0];
                     embeds.push({
                         type: 'vimeo',
@@ -932,7 +983,8 @@
                         originalUrl: url
                     });
                     processedText = processedText.replace(url, '');
-                } else {
+                }
+                else {
                     embeds.push({
                         type: 'link',
                         url: url,
@@ -982,16 +1034,6 @@
                 saveMessages();
                 loadMessages();
             }
-        }
-        
-        // Play Voice Message
-        function playVoice(audioData, button) {
-            const audio = new Audio(audioData);
-            audio.play();
-            button.textContent = '⏸';
-            audio.onended = () => {
-                button.textContent = '▶';
-            };
         }
         
         // View Image
@@ -1046,37 +1088,77 @@
         function showRegister() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
         }
         
         function showLogin() {
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
         }
         
         function register() {
             const username = document.getElementById('registerUsername').value.trim();
             const password = document.getElementById('registerPassword').value;
             const confirm = document.getElementById('confirmPassword').value;
-            if (!username || !password) return showError('Fill all fields');
-            if (password !== confirm) return showError('Passwords dont match');
-            if (users[username]) return showError('Username exists');
-            users[username] = { username, password: btoa(password), createdAt: new Date().toISOString() };
+            
+            if (!username || !password) {
+                showError('Fill all fields');
+                return;
+            }
+            if (password !== confirm) {
+                showError('Passwords do not match');
+                return;
+            }
+            if (users[username]) {
+                showError('Username exists');
+                return;
+            }
+            
+            users[username] = {
+                username: username,
+                password: btoa(password),
+                createdAt: new Date().toISOString()
+            };
             saveUsers();
             showSuccess('Account created!');
-            setTimeout(() => showLogin(), 1500);
+            setTimeout(() => {
+                showLogin();
+                document.getElementById('registerUsername').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            }, 1500);
         }
         
         function login() {
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
             const user = users[username];
-            if (!user || user.password !== btoa(password)) return showError('Invalid credentials');
+            
+            if (!user || user.password !== btoa(password)) {
+                showError('Invalid credentials');
+                return;
+            }
+            
             currentUser = username;
             localStorage.setItem('shadowchat_currentUser', currentUser);
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('appSection').style.display = 'flex';
             document.getElementById('currentUsername').textContent = currentUser;
+            
+            // Load messages
+            const storedMessages = localStorage.getItem('shadowchat_messages');
+            if (storedMessages) {
+                messages = JSON.parse(storedMessages);
+                lastMessageCount = messages.length;
+            }
             loadMessages();
+            
+            // Clear login fields
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
         }
         
         function logout() {
@@ -1084,6 +1166,10 @@
             localStorage.removeItem('shadowchat_currentUser');
             document.getElementById('authSection').style.display = 'flex';
             document.getElementById('appSection').style.display = 'none';
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
         }
         
         function sendMessage() {
@@ -1113,6 +1199,7 @@
             const container = document.getElementById('messagesContainer');
             const stored = localStorage.getItem('shadowchat_messages');
             if (stored) messages = JSON.parse(stored);
+            
             if (!messages.length) {
                 container.innerHTML = '<div class="empty-messages">No messages yet</div>';
                 return;
@@ -1128,8 +1215,12 @@
                 } else if (msg.type === 'voice') {
                     contentHtml = `
                         <div class="voice-message">
-                            <div class="play-btn" onclick="playVoice('${msg.content}', this)" style="pointer-events: auto;">▶</div>
-                            <div class="voice-duration">Voice note</div>
+                            <button class="play-btn" onclick="playVoice('${msg.content}', this)" style="pointer-events: auto;">
+                                <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                </svg>
+                            </button>
+                            <span class="voice-duration">Voice note</span>
                         </div>
                     `;
                 } else {
@@ -1137,7 +1228,6 @@
                     if (textContent === '') textContent = ' ';
                     contentHtml = `<div class="message-content">${textContent}</div>`;
                     
-                    // Add embeds
                     if (msg.embeds && msg.embeds.length > 0) {
                         msg.embeds.forEach(embed => {
                             if (embed.type === 'youtube' || embed.type === 'vimeo') {
@@ -1165,4 +1255,87 @@
                 const editedHtml = msg.edited ? '<span class="edited-indicator">edited</span>' : '';
                 
                 return `
-                    <div class="message ${isSent ? 'sent' :
+                    <div class="message ${isSent ? 'sent' : 'received'}" onclick="showActionMenu(${msg.id}, event)">
+                        <div class="message-bubble">
+                            <span class="message-sender">${escapeHtml(msg.sender)}</span>
+                            ${contentHtml}
+                            <span class="message-time">${formatTime(msg.timestamp)}${editedHtml}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function formatTime(ts) {
+            const date = new Date(ts);
+            const now = new Date();
+            const diff = now - date;
+            if (diff < 60000) return 'now';
+            if (diff < 3600000) return `${Math.floor(diff/60000)}m`;
+            if (diff < 86400000) return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            return date.toLocaleDateString([], {month:'short', day:'numeric'});
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function checkSession() {
+            const saved = localStorage.getItem('shadowchat_currentUser');
+            if (saved && users[saved]) {
+                currentUser = saved;
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('appSection').style.display = 'flex';
+                document.getElementById('currentUsername').textContent = currentUser;
+                const storedMessages = localStorage.getItem('shadowchat_messages');
+                if (storedMessages) {
+                    messages = JSON.parse(storedMessages);
+                    lastMessageCount = messages.length;
+                }
+                loadMessages();
+            }
+        }
+        
+        // Auto-refresh
+        setInterval(() => {
+            if (currentUser) {
+                const stored = localStorage.getItem('shadowchat_messages');
+                if (stored) {
+                    const newMsgs = JSON.parse(stored);
+                    if (newMsgs.length > lastMessageCount) {
+                        loadMessages();
+                        lastMessageCount = newMsgs.length;
+                    }
+                }
+            }
+        }, 2000);
+        
+        // Auto-resize textarea
+        document.addEventListener('DOMContentLoaded', () => {
+            const ta = document.getElementById('messageInput');
+            if (ta) {
+                ta.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+                });
+                ta.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+            }
+            
+            // Set up action menu button listeners
+            document.getElementById('editAction').onclick = editSelectedMessage;
+            document.getElementById('deleteAction').onclick = deleteSelectedMessage;
+        });
+        
+        loadData();
+        checkSession();
+    </script>
+</body>
+</html>
