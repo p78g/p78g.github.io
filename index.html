@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
-    <title>ShadowChat - Friend System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>ShadowChat</title>
     <style>
         * {
             margin: 0;
@@ -17,136 +17,25 @@
             background: #0a0a0a;
             height: 100vh;
             overflow: hidden;
-            position: fixed;
-            width: 100%;
         }
 
-        /* Auth Screen */
-        .auth-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #0a0a0a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .auth-box {
-            background: #1a1a1a;
-            padding: 30px 20px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 380px;
-        }
-
-        .auth-box h1 {
-            background: linear-gradient(135deg, #a78bfa, #ec489a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 28px;
-            text-align: center;
-            font-size: 28px;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 14px 16px;
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            border-radius: 12px;
-            font-size: 16px;
-            color: white;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #25D366;
-        }
-
-        .auth-btn {
-            background: #25D366;
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 8px;
-        }
-
-        .switch-auth {
-            text-align: center;
-            margin-top: 20px;
-            color: #9ca3af;
-            font-size: 14px;
-        }
-
-        .switch-auth a {
-            color: #25D366;
-            cursor: pointer;
-        }
-
-        .error-msg, .success-msg {
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            display: none;
-            font-size: 14px;
-        }
-
-        .error-msg {
-            background: rgba(248, 113, 113, 0.1);
-            color: #f87171;
-            border: 1px solid rgba(248, 113, 113, 0.2);
-        }
-
-        .success-msg {
-            background: rgba(74, 222, 128, 0.1);
-            color: #4ade80;
-            border: 1px solid rgba(74, 222, 128, 0.2);
-        }
-
-        /* Main App */
         .app-main {
-            display: none;
+            display: flex;
             height: 100vh;
             width: 100%;
-            position: relative;
         }
 
+        /* Sidebar - Chat List */
         .sidebar {
-            width: 100%;
-            max-width: 320px;
+            width: 300px;
             background: #1a1a1a;
             border-right: 1px solid #2a2a2a;
             display: flex;
             flex-direction: column;
-            position: fixed;
-            left: -100%;
-            top: 0;
-            bottom: 0;
-            z-index: 50;
-            transition: left 0.3s ease;
-        }
-
-        .sidebar.open {
-            left: 0;
         }
 
         .sidebar-header {
-            padding: 16px;
+            padding: 20px;
             border-bottom: 1px solid #2a2a2a;
         }
 
@@ -161,136 +50,25 @@
             color: #25D366;
             font-weight: 600;
             background: rgba(37, 211, 102, 0.1);
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 14px;
         }
 
         .logout-btn {
             background: rgba(255, 255, 255, 0.05);
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             cursor: pointer;
             border: none;
             color: white;
-            font-size: 12px;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            background: #2a2a2a;
-            padding: 10px;
-            border: none;
-            border-radius: 12px;
-            color: #9ca3af;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .tab-btn.active {
-            background: #25D366;
-            color: white;
-        }
-
-        .add-friend-section {
-            background: #2a2a2a;
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-
-        .add-friend-input {
-            display: flex;
-            gap: 8px;
-        }
-
-        .add-friend-input input {
-            flex: 1;
-            padding: 10px 12px;
-            background: #1a1a1a;
-            border: 1px solid #3a3a3a;
-            border-radius: 12px;
-            color: white;
             font-size: 14px;
         }
 
-        .add-friend-btn {
-            background: #25D366;
-            padding: 8px 16px;
-            border-radius: 12px;
-            border: none;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 14px;
-        }
-
-        .friend-requests {
-            background: #2a2a2a;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 16px;
-        }
-
-        .friend-requests h4 {
-            color: #9ca3af;
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
-
-        .request-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: #1a1a1a;
-            border-radius: 10px;
-            margin-bottom: 8px;
-        }
-
-        .request-username {
-            color: white;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .request-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .accept-btn, .decline-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .accept-btn {
-            background: #25D366;
-        }
-
-        .decline-btn {
-            background: #f87171;
-        }
-
-        .chats-list, .friends-list {
+        .chats-list {
             flex: 1;
             overflow-y: auto;
-            padding: 8px;
+            padding: 12px;
         }
 
         .chat-item {
@@ -321,35 +99,21 @@
             margin-top: 4px;
         }
 
-        /* Main Chat */
+        /* Main Chat Area */
         .main-chat {
             flex: 1;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            width: 100%;
+            background: #0a0a0a;
         }
 
         .chat-header {
             background: #1a1a1a;
-            padding: 12px 16px;
+            padding: 16px 20px;
             border-bottom: 1px solid #2a2a2a;
             display: flex;
             align-items: center;
             gap: 12px;
-        }
-
-        .menu-btn {
-            background: #2a2a2a;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .chat-title {
@@ -359,14 +123,14 @@
         }
 
         .chat-subtitle {
-            font-size: 11px;
+            font-size: 12px;
             color: #9ca3af;
         }
 
         .messages-container {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
         }
@@ -386,7 +150,7 @@
         }
 
         .message-bubble {
-            max-width: 80%;
+            max-width: 70%;
             padding: 8px 12px;
             border-radius: 18px;
             cursor: pointer;
@@ -406,7 +170,7 @@
         }
 
         .message-sender {
-            font-size: 0.65em;
+            font-size: 0.7em;
             font-weight: 600;
             margin-bottom: 4px;
             display: block;
@@ -421,7 +185,7 @@
         }
 
         .message-content {
-            font-size: 0.9em;
+            font-size: 0.95em;
             line-height: 1.4;
             word-break: break-word;
         }
@@ -436,26 +200,26 @@
 
         .embed-video iframe {
             width: 100%;
-            height: 200px;
+            height: 225px;
             border: none;
         }
 
         .embed-link {
-            padding: 10px;
+            padding: 12px;
             text-decoration: none;
             color: inherit;
             display: block;
         }
 
         .embed-url {
-            font-size: 0.65em;
+            font-size: 0.7em;
             opacity: 0.7;
             word-break: break-all;
         }
 
         .message-image {
             max-width: 100%;
-            max-height: 250px;
+            max-height: 300px;
             border-radius: 12px;
             cursor: pointer;
             margin-top: 4px;
@@ -486,13 +250,13 @@
         }
 
         .edited-indicator {
-            font-size: 0.65em;
+            font-size: 0.7em;
             margin-left: 6px;
             color: #a78bfa;
         }
 
         .message-time {
-            font-size: 0.6em;
+            font-size: 0.65em;
             margin-top: 4px;
             display: block;
             text-align: right;
@@ -507,18 +271,17 @@
             display: none;
             flex-direction: column;
             z-index: 1000;
-            min-width: 120px;
+            min-width: 140px;
         }
 
         .action-menu-item {
-            padding: 10px 14px;
+            padding: 10px 16px;
             background: none;
             border: none;
             color: white;
             text-align: left;
             cursor: pointer;
             border-radius: 10px;
-            font-size: 14px;
         }
 
         .action-menu-item:hover {
@@ -530,17 +293,17 @@
         }
 
         .message-input-container {
-            padding: 12px 16px;
+            padding: 16px 20px;
             background: #1a1a1a;
             border-top: 1px solid #2a2a2a;
             display: flex;
-            gap: 8px;
+            gap: 12px;
             align-items: flex-end;
         }
 
         .input-buttons {
             display: flex;
-            gap: 6px;
+            gap: 8px;
         }
 
         .icon-btn {
@@ -556,8 +319,8 @@
         }
 
         .icon-btn svg {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             stroke: #9ca3af;
             fill: none;
         }
@@ -568,26 +331,24 @@
 
         .message-input {
             flex: 1;
-            padding: 10px 14px;
+            padding: 12px 16px;
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
             border-radius: 24px;
             color: white;
             resize: none;
             font-family: inherit;
-            font-size: 15px;
-            max-height: 80px;
+            max-height: 100px;
         }
 
         .send-btn {
             background: #25D366;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 24px;
             border: none;
             color: white;
             font-weight: 600;
             cursor: pointer;
-            font-size: 14px;
         }
 
         .modal {
@@ -601,29 +362,129 @@
             z-index: 2000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
         }
 
         .modal-content {
             background: #1a1a1a;
-            padding: 20px;
+            padding: 24px;
             border-radius: 24px;
-            width: 100%;
-            max-width: 350px;
+            width: 90%;
+            max-width: 400px;
         }
 
-        @media (min-width: 769px) {
+        .auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .auth-box {
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 380px;
+        }
+
+        .auth-box h1 {
+            background: linear-gradient(135deg, #a78bfa, #ec489a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            font-size: 15px;
+            color: white;
+        }
+
+        .auth-btn {
+            background: #25D366;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .switch-auth {
+            text-align: center;
+            margin-top: 20px;
+            color: #9ca3af;
+        }
+
+        .switch-auth a {
+            color: #25D366;
+            cursor: pointer;
+        }
+
+        .error-msg, .success-msg {
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .error-msg {
+            background: rgba(248, 113, 113, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .success-msg {
+            background: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        @media (max-width: 768px) {
             .sidebar {
-                position: relative;
+                position: fixed;
+                left: -300px;
+                top: 0;
+                bottom: 0;
+                z-index: 50;
+                transition: left 0.3s;
+            }
+            .sidebar.open {
                 left: 0;
-                max-width: 280px;
             }
             .menu-btn {
-                display: none;
+                display: block;
             }
-            .app-main {
-                display: flex;
-            }
+        }
+
+        .menu-btn {
+            display: none;
+            background: #2a2a2a;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            color: white;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/4.2.0/parse.min.js"></script>
@@ -668,47 +529,15 @@
     </div>
 
     <!-- Main App -->
-    <div id="mainApp" class="app-main">
+    <div id="mainApp" class="app-main" style="display:none;">
         <div id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <div class="user-info">
                     <span class="username-display" id="sidebarUsername"></span>
                     <button class="logout-btn" id="sidebarLogout">Exit</button>
                 </div>
-                
-                <div class="nav-tabs">
-                    <button class="tab-btn active" id="chatsTab">Chats</button>
-                    <button class="tab-btn" id="friendsTab">Friends</button>
-                </div>
-                
-                <div id="chatsPanel">
-                    <div class="chats-list" id="chatsList"></div>
-                </div>
-                
-                <div id="friendsPanel" style="display:none;">
-                    <div class="add-friend-section">
-                        <div class="add-friend-input">
-                            <input type="text" id="friendUsername" placeholder="Username to add">
-                            <button id="addFriendBtn" class="add-friend-btn">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                    <path d="M12 5v14M5 12h14"/>
-                                </svg>
-                                Add
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="friend-requests" id="friendRequests">
-                        <h4>Friend Requests</h4>
-                        <div id="requestsList"></div>
-                    </div>
-                    
-                    <div class="friend-requests">
-                        <h4>Your Friends</h4>
-                        <div id="friendsList" class="friends-list"></div>
-                    </div>
-                </div>
             </div>
+            <div class="chats-list" id="chatsList"></div>
         </div>
 
         <div class="main-chat">
@@ -721,14 +550,12 @@
                     </svg>
                 </button>
                 <div>
-                    <div class="chat-title" id="chatTitle">Select a chat</div>
-                    <div class="chat-subtitle" id="chatSubtitle"></div>
+                    <div class="chat-title" id="chatTitle">Public Chat</div>
+                    <div class="chat-subtitle" id="chatSubtitle">Everyone can see</div>
                 </div>
             </div>
-            <div class="messages-container" id="messagesContainer">
-                <div style="text-align:center; color:#6b7280; padding:40px;">Select a chat to start messaging</div>
-            </div>
-            <div class="message-input-container" id="inputContainer" style="display:none;">
+            <div class="messages-container" id="messagesContainer"></div>
+            <div class="message-input-container">
                 <div class="input-buttons">
                     <button class="icon-btn" id="imageBtn">
                         <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -777,10 +604,7 @@
         Parse.serverURL = 'https://parseapi.back4app.com/';
 
         let currentUser = null;
-        let currentChat = null;
-        let currentChatType = null;
         let messagesSubscription = null;
-        let pressTimer = null;
         let selectedMessage = null;
         let mediaRecorder = null;
         let audioChunks = [];
@@ -795,15 +619,12 @@
         const chatsList = document.getElementById('chatsList');
         const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
-        const inputContainer = document.getElementById('inputContainer');
         const chatTitle = document.getElementById('chatTitle');
         const chatSubtitle = document.getElementById('chatSubtitle');
         const sidebarUsername = document.getElementById('sidebarUsername');
         const actionMenu = document.getElementById('actionMenu');
         const editModal = document.getElementById('editModal');
         const editText = document.getElementById('editText');
-        const requestsList = document.getElementById('requestsList');
-        const friendsList = document.getElementById('friendsList');
         const sidebar = document.getElementById('sidebar');
         const menuBtn = document.getElementById('menuBtn');
 
@@ -859,245 +680,37 @@
             return { text: processedText.trim(), embeds };
         }
 
-        // Load friends and requests
-        async function loadFriendsAndRequests() {
-            if (!currentUser) return;
-            
-            try {
-                // Load friend requests
-                const FriendRequest = Parse.Object.extend("FriendRequest");
-                const reqQuery = new Parse.Query(FriendRequest);
-                reqQuery.equalTo("toUserId", currentUser.id);
-                reqQuery.equalTo("status", "pending");
-                const requests = await reqQuery.find();
-                
-                requestsList.innerHTML = '';
-                for (const req of requests) {
-                    const fromUserId = req.get("fromUserId");
-                    const fromUser = await new Parse.Query(Parse.User).get(fromUserId);
-                    const div = document.createElement('div');
-                    div.className = 'request-item';
-                    div.innerHTML = `
-                        <span class="request-username">${escapeHtml(fromUser.get('username'))}</span>
-                        <div class="request-actions">
-                            <button class="accept-btn" data-id="${req.id}" data-userid="${fromUserId}">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                    <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                            </button>
-                            <button class="decline-btn" data-id="${req.id}">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"/>
-                                    <line x1="6" y1="6" x2="18" y2="18"/>
-                                </svg>
-                            </button>
-                        </div>
-                    `;
-                    requestsList.appendChild(div);
-                }
-                
-                // Add event listeners to buttons
-                document.querySelectorAll('.accept-btn').forEach(btn => {
-                    btn.onclick = () => acceptFriendRequest(btn.dataset.id, btn.dataset.userid);
-                });
-                document.querySelectorAll('.decline-btn').forEach(btn => {
-                    btn.onclick = () => declineFriendRequest(btn.dataset.id);
-                });
-                
-                // Load friends
-                const Friend = Parse.Object.extend("Friend");
-                const friendQuery = new Parse.Query(Friend);
-                friendQuery.equalTo("userId", currentUser.id);
-                const friends = await friendQuery.find();
-                
-                friendsList.innerHTML = '';
-                for (const friend of friends) {
-                    const friendUserId = friend.get("friendUserId");
-                    const friendUser = await new Parse.Query(Parse.User).get(friendUserId);
-                    const div = document.createElement('div');
-                    div.className = 'chat-item';
-                    div.innerHTML = `<div class="chat-name">${escapeHtml(friendUser.get('username'))}</div>`;
-                    div.onclick = () => startPrivateChat(friendUser.get('username'));
-                    friendsList.appendChild(div);
-                }
-            } catch (err) {
-                console.error("Error loading friends:", err);
-            }
-        }
-
-        // Accept friend request
-        async function acceptFriendRequest(requestId, fromUserId) {
-            try {
-                // Add to friends list for current user
-                const Friend = Parse.Object.extend("Friend");
-                const friend1 = new Friend();
-                friend1.set("userId", currentUser.id);
-                friend1.set("friendUserId", fromUserId);
-                await friend1.save();
-                
-                // Add to friends list for the other user
-                const friend2 = new Friend();
-                friend2.set("userId", fromUserId);
-                friend2.set("friendUserId", currentUser.id);
-                await friend2.save();
-                
-                // Delete the request
-                const FriendRequest = Parse.Object.extend("FriendRequest");
-                const query = new Parse.Query(FriendRequest);
-                const request = await query.get(requestId);
-                await request.destroy();
-                
-                showSuccess("Friend request accepted!");
-                await loadFriendsAndRequests();
-                await loadChats();
-            } catch (err) {
-                showError("Error accepting friend request: " + err.message);
-            }
-        }
-        
-        // Decline friend request
-        async function declineFriendRequest(requestId) {
-            try {
-                const FriendRequest = Parse.Object.extend("FriendRequest");
-                const query = new Parse.Query(FriendRequest);
-                const request = await query.get(requestId);
-                await request.destroy();
-                showSuccess("Friend request declined");
-                await loadFriendsAndRequests();
-            } catch (err) {
-                showError("Error declining friend request");
-            }
-        }
-        
-        // Send friend request
-        async function sendFriendRequest() {
-            const username = document.getElementById('friendUsername').value.trim();
-            if (!username) return showError('Enter a username');
-            if (username === currentUser.get('username')) return showError('You cannot add yourself');
-            
-            try {
-                const userQuery = new Parse.Query(Parse.User);
-                userQuery.equalTo("username", username);
-                const targetUser = await userQuery.first();
-                if (!targetUser) return showError('User not found');
-                
-                // Check if already friends
-                const Friend = Parse.Object.extend("Friend");
-                const friendQuery = new Parse.Query(Friend);
-                friendQuery.equalTo("userId", currentUser.id);
-                friendQuery.equalTo("friendUserId", targetUser.id);
-                const existingFriend = await friendQuery.first();
-                if (existingFriend) return showError('Already friends with this user');
-                
-                // Check if request already sent
-                const FriendRequest = Parse.Object.extend("FriendRequest");
-                const reqQuery = new Parse.Query(FriendRequest);
-                reqQuery.equalTo("fromUserId", currentUser.id);
-                reqQuery.equalTo("toUserId", targetUser.id);
-                reqQuery.equalTo("status", "pending");
-                const existingReq = await reqQuery.first();
-                if (existingReq) return showError('Friend request already sent');
-                
-                // Send friend request
-                const request = new FriendRequest();
-                request.set("fromUserId", currentUser.id);
-                request.set("toUserId", targetUser.id);
-                request.set("status", "pending");
-                await request.save();
-                
-                showSuccess(`Friend request sent to ${username}`);
-                document.getElementById('friendUsername').value = '';
-                await loadFriendsAndRequests();
-            } catch (err) {
-                showError("Error sending friend request: " + err.message);
-            }
-        }
-        
-        async function startPrivateChat(username) {
-            try {
-                const userQuery = new Parse.Query(Parse.User);
-                userQuery.equalTo("username", username);
-                const targetUser = await userQuery.first();
-                if (!targetUser) return;
-                
-                const chatId = [currentUser.id, targetUser.id].sort().join('_');
-                openChat('private', chatId, username);
-                
-                // Close sidebar on mobile
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('open');
-                }
-            } catch (err) {
-                showError("Error starting chat");
-            }
-        }
-
-        // Load chats
+        // Load chats (only public chat for now)
         async function loadChats() {
             if (!currentUser) return;
             
-            try {
-                const Friend = Parse.Object.extend("Friend");
-                const friendQuery = new Parse.Query(Friend);
-                friendQuery.equalTo("userId", currentUser.id);
-                const friends = await friendQuery.find();
-                
-                chatsList.innerHTML = '';
-                
-                // Public Chat
-                const publicDiv = document.createElement('div');
-                publicDiv.className = `chat-item ${currentChat === 'public' ? 'active' : ''}`;
-                publicDiv.innerHTML = `
-                    <div class="chat-name">Public Chat</div>
-                    <div class="chat-type">Everyone can see</div>
-                `;
-                publicDiv.onclick = () => openChat('public', null, 'Public Chat');
-                chatsList.appendChild(publicDiv);
-                
-                // Friend Chats
-                for (const friend of friends) {
-                    const friendUserId = friend.get("friendUserId");
-                    const friendUser = await new Parse.Query(Parse.User).get(friendUserId);
-                    const chatId = [currentUser.id, friendUserId].sort().join('_');
-                    const div = document.createElement('div');
-                    div.className = `chat-item ${currentChat === chatId ? 'active' : ''}`;
-                    div.innerHTML = `
-                        <div class="chat-name">${escapeHtml(friendUser.get('username'))}</div>
-                        <div class="chat-type">Private chat</div>
-                    `;
-                    div.onclick = () => openChat('private', chatId, friendUser.get('username'));
-                    chatsList.appendChild(div);
-                }
-            } catch (err) {
-                console.error("Error loading chats:", err);
-            }
+            chatsList.innerHTML = '';
+            
+            // Public Chat
+            const publicDiv = document.createElement('div');
+            publicDiv.className = `chat-item active`;
+            publicDiv.innerHTML = `
+                <div class="chat-name">Public Chat</div>
+                <div class="chat-type">Everyone can see</div>
+            `;
+            publicDiv.onclick = () => openPublicChat();
+            chatsList.appendChild(publicDiv);
         }
 
-        // Open a chat
-        async function openChat(type, chatId, title) {
+        // Open public chat
+        async function openPublicChat() {
             if (messagesSubscription) {
                 messagesSubscription.unsubscribe();
             }
             
-            currentChat = chatId || type;
-            currentChatType = type;
-            chatTitle.textContent = title;
-            chatSubtitle.textContent = type === 'public' ? 'Public chat - everyone can see' : 'Private conversation';
-            inputContainer.style.display = 'flex';
+            chatTitle.textContent = "Public Chat";
+            chatSubtitle.textContent = "Everyone can see";
             
             try {
                 // Load messages
                 const Message = Parse.Object.extend("Message");
                 const query = new Parse.Query(Message);
-                
-                if (type === 'public') {
-                    query.equalTo("chatType", "public");
-                    query.equalTo("chatId", "public");
-                } else {
-                    query.equalTo("chatType", "private");
-                    query.equalTo("chatId", chatId);
-                }
-                
+                query.equalTo("chatType", "public");
                 query.descending("createdAt");
                 query.limit(100);
                 const results = await query.find();
@@ -1192,7 +805,7 @@
         // Send message
         async function sendMessage() {
             const content = messageInput.value.trim();
-            if (!content || !currentChat) return;
+            if (!content) return;
             
             try {
                 const Message = Parse.Object.extend("Message");
@@ -1202,14 +815,8 @@
                 newMessage.set("content", content);
                 newMessage.set("type", "text");
                 newMessage.set("edited", false);
-                
-                if (currentChatType === 'public') {
-                    newMessage.set("chatType", "public");
-                    newMessage.set("chatId", "public");
-                } else {
-                    newMessage.set("chatType", "private");
-                    newMessage.set("chatId", currentChat);
-                }
+                newMessage.set("chatType", "public");
+                newMessage.set("chatId", "public");
                 
                 await newMessage.save();
                 messageInput.value = '';
@@ -1227,6 +834,7 @@
                 msg.set("content", newContent);
                 msg.set("edited", true);
                 await msg.save();
+                await openPublicChat(); // Refresh messages
             } catch (err) {
                 showError("Error editing message");
             }
@@ -1238,6 +846,7 @@
                 const query = new Parse.Query("Message");
                 const msg = await query.get(messageId);
                 await msg.destroy();
+                await openPublicChat(); // Refresh messages
             } catch (err) {
                 showError("Error deleting message");
             }
@@ -1293,14 +902,8 @@
                         newMessage.set("content", reader.result);
                         newMessage.set("type", "voice");
                         newMessage.set("edited", false);
-                        
-                        if (currentChatType === 'public') {
-                            newMessage.set("chatType", "public");
-                            newMessage.set("chatId", "public");
-                        } else {
-                            newMessage.set("chatType", "private");
-                            newMessage.set("chatId", currentChat);
-                        }
+                        newMessage.set("chatType", "public");
+                        newMessage.set("chatId", "public");
                         await newMessage.save();
                         stream.getTracks().forEach(track => track.stop());
                     };
@@ -1331,14 +934,8 @@
                     newMessage.set("content", e.target.result);
                     newMessage.set("type", "image");
                     newMessage.set("edited", false);
-                    
-                    if (currentChatType === 'public') {
-                        newMessage.set("chatType", "public");
-                        newMessage.set("chatId", "public");
-                    } else {
-                        newMessage.set("chatType", "private");
-                        newMessage.set("chatId", currentChat);
-                    }
+                    newMessage.set("chatType", "public");
+                    newMessage.set("chatId", "public");
                     await newMessage.save();
                 };
                 reader.readAsDataURL(file);
@@ -1374,18 +971,16 @@
                 sidebarUsername.textContent = user.get('username');
                 authScreen.style.display = 'none';
                 mainApp.style.display = 'flex';
-                await loadFriendsAndRequests();
                 await loadChats();
-                openChat('public', null, 'Public Chat');
+                await openPublicChat();
                 
-                // Auto-refresh every 5 seconds
+                // Auto-refresh every 3 seconds
                 if (refreshInterval) clearInterval(refreshInterval);
                 refreshInterval = setInterval(async () => {
                     if (currentUser) {
-                        await loadFriendsAndRequests();
-                        await loadChats();
+                        await openPublicChat();
                     }
-                }, 5000);
+                }, 3000);
             } catch (err) {
                 showError('Invalid username or password');
             }
@@ -1400,21 +995,6 @@
             document.getElementById('loginUsername').value = '';
             document.getElementById('loginPassword').value = '';
         }
-
-        // Tab switching
-        document.getElementById('chatsTab').onclick = () => {
-            document.getElementById('chatsTab').classList.add('active');
-            document.getElementById('friendsTab').classList.remove('active');
-            document.getElementById('chatsPanel').style.display = 'block';
-            document.getElementById('friendsPanel').style.display = 'none';
-        };
-        document.getElementById('friendsTab').onclick = () => {
-            document.getElementById('friendsTab').classList.add('active');
-            document.getElementById('chatsTab').classList.remove('active');
-            document.getElementById('chatsPanel').style.display = 'none';
-            document.getElementById('friendsPanel').style.display = 'block';
-            loadFriendsAndRequests();
-        };
 
         // Menu toggle for mobile
         menuBtn.onclick = () => {
@@ -1446,7 +1026,6 @@
         document.getElementById('imageBtn').onclick = () => document.getElementById('imageFile').click();
         document.getElementById('voiceBtn').onclick = startVoiceRecording;
         document.getElementById('imageFile').onchange = (e) => handleImageUpload(e.target.files[0]);
-        document.getElementById('addFriendBtn').onclick = sendFriendRequest;
         
         // Edit/Delete actions
         document.getElementById('editAction').onclick = () => {
@@ -1460,10 +1039,6 @@
             if (selectedMessage && confirm('Delete this message?')) {
                 await deleteMessage(selectedMessage.id);
                 closeActionMenu();
-                // Refresh messages
-                if (currentChat) {
-                    openChat(currentChatType, currentChat, chatTitle.textContent);
-                }
             }
         };
         document.getElementById('saveEditBtn').onclick = async () => {
@@ -1471,10 +1046,6 @@
             if (newContent && selectedMessage) {
                 await editMessage(selectedMessage.id, newContent);
                 editModal.style.display = 'none';
-                // Refresh messages
-                if (currentChat) {
-                    openChat(currentChatType, currentChat, chatTitle.textContent);
-                }
             }
         };
         document.getElementById('cancelEditBtn').onclick = () => editModal.style.display = 'none';
@@ -1482,7 +1053,7 @@
         // Auto-resize textarea
         messageInput.addEventListener('input', function() {
             this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
         });
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -1501,16 +1072,14 @@
             sidebarUsername.textContent = currentUser.get('username');
             authScreen.style.display = 'none';
             mainApp.style.display = 'flex';
-            loadFriendsAndRequests();
             loadChats();
-            openChat('public', null, 'Public Chat');
+            openPublicChat();
             
             refreshInterval = setInterval(async () => {
                 if (currentUser) {
-                    await loadFriendsAndRequests();
-                    await loadChats();
+                    await openPublicChat();
                 }
-            }, 5000);
+            }, 3000);
         }
     </script>
 </body>
