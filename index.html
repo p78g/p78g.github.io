@@ -614,7 +614,7 @@
                         <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                     </svg>
                     <span>Enable notifications</span>
-                    <button onclick="requestNotificationPermission()" class="enable-notif-btn">Enable</button>
+                    <button id="enableNotifBtn" class="enable-notif-btn">Enable</button>
                 </div>
                 <div id="errorMessage" class="error-message"></div>
                 <div id="successMessage" class="success-message"></div>
@@ -628,9 +628,9 @@
                         <label>Password</label>
                         <input type="password" id="loginPassword" placeholder="Enter password">
                     </div>
-                    <button onclick="login()">Sign In</button>
+                    <button id="loginBtn">Sign In</button>
                     <div class="switch-auth">
-                        No account? <a onclick="showRegister()">Create one</a>
+                        No account? <a id="showRegisterLink">Create one</a>
                     </div>
                 </div>
 
@@ -647,9 +647,9 @@
                         <label>Confirm Password</label>
                         <input type="password" id="confirmPassword" placeholder="Confirm password">
                     </div>
-                    <button onclick="register()">Create Account</button>
+                    <button id="registerBtn">Create Account</button>
                     <div class="switch-auth">
-                        Already have an account? <a onclick="showLogin()">Sign in</a>
+                        Already have an account? <a id="showLoginLink">Sign in</a>
                     </div>
                 </div>
             </div>
@@ -659,20 +659,20 @@
             <div class="header">
                 <div class="user-info">
                     <span class="username-display" id="currentUsername"></span>
-                    <button onclick="logout()" class="logout-btn">Exit</button>
+                    <button id="logoutBtn" class="logout-btn">Exit</button>
                 </div>
             </div>
             <div class="messages-container" id="messagesContainer"></div>
             <div class="message-input-container">
                 <div class="input-buttons">
-                    <button class="icon-btn" onclick="document.getElementById('imageInput').click()">
+                    <button id="imageUploadBtn" class="icon-btn">
                         <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
                             <circle cx="8.5" cy="8.5" r="2.5" />
                             <path d="M21 15l-5-4-3 3-4-4-5 5" />
                         </svg>
                     </button>
-                    <button class="icon-btn" id="micBtn" onclick="startVoiceRecording()">
+                    <button id="micBtn" class="icon-btn">
                         <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z" />
                             <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
@@ -680,29 +680,29 @@
                         </svg>
                     </button>
                 </div>
-                <textarea class="message-input" id="messageInput" rows="1" placeholder="Type a message..."></textarea>
-                <button onclick="sendMessage()" class="send-btn">Send</button>
+                <textarea id="messageInput" class="message-input" rows="1" placeholder="Type a message..."></textarea>
+                <button id="sendBtn" class="send-btn">Send</button>
             </div>
         </div>
     </div>
 
-    <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
+    <input type="file" id="imageInput" accept="image/*" style="display: none;">
     <div id="actionMenu" class="action-menu">
-        <button class="action-menu-item" id="editAction">Edit</button>
+        <button id="editAction" class="action-menu-item">Edit</button>
         <div class="action-menu-divider"></div>
-        <button class="action-menu-item delete" id="deleteAction">Delete</button>
+        <button id="deleteAction" class="action-menu-item delete">Delete</button>
     </div>
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h3>Edit Message</h3>
             <textarea id="editText" rows="3"></textarea>
             <div class="modal-buttons">
-                <button onclick="saveEdit()">Save</button>
-                <button onclick="closeEditModal()" style="background: #3a3a3a;">Cancel</button>
+                <button id="saveEditBtn">Save</button>
+                <button id="cancelEditBtn" style="background: #3a3a3a;">Cancel</button>
             </div>
         </div>
     </div>
-    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+    <div id="imageModal" class="image-modal">
         <img id="modalImage" src="">
     </div>
 
@@ -735,7 +735,31 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Global variables
+        // DOM elements
+        const authSection = document.getElementById('authSection');
+        const appSection = document.getElementById('appSection');
+        const currentUsernameSpan = document.getElementById('currentUsername');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const micBtn = document.getElementById('micBtn');
+        const notificationBanner = document.getElementById('notificationBanner');
+        const errorDiv = document.getElementById('errorMessage');
+        const successDiv = document.getElementById('successMessage');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginUsername = document.getElementById('loginUsername');
+        const loginPassword = document.getElementById('loginPassword');
+        const registerUsername = document.getElementById('registerUsername');
+        const registerPassword = document.getElementById('registerPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const imageInput = document.getElementById('imageInput');
+        const actionMenu = document.getElementById('actionMenu');
+        const editModal = document.getElementById('editModal');
+        const editText = document.getElementById('editText');
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+
+        // Global state
         let currentUserObj = null;
         let currentUserId = null;
         let currentUsername = "";
@@ -749,19 +773,7 @@
         let pressTimer = null;
         let editingMessageId = null;
 
-        // DOM elements
-        const authSection = document.getElementById('authSection');
-        const appSection = document.getElementById('appSection');
-        const currentUsernameSpan = document.getElementById('currentUsername');
-        const messagesContainer = document.getElementById('messagesContainer');
-        const messageInput = document.getElementById('messageInput');
-        const micBtn = document.getElementById('micBtn');
-        const notificationBanner = document.getElementById('notificationBanner');
-        const errorDiv = document.getElementById('errorMessage');
-        const successDiv = document.getElementById('successMessage');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-
+        // Helper functions
         function showError(msg) {
             errorDiv.textContent = msg;
             errorDiv.style.display = 'block';
@@ -774,7 +786,8 @@
             setTimeout(() => successDiv.style.display = 'none', 3000);
         }
 
-        window.requestNotificationPermission = function() {
+        // Notifications
+        function requestNotificationPermission() {
             if (!("Notification" in window)) return;
             Notification.requestPermission().then(permission => {
                 if (permission === "granted") {
@@ -783,8 +796,9 @@
                     showSuccess("Notifications enabled");
                 }
             });
-        };
+        }
 
+        // Long press handlers
         function startLongPress(messageId, event) {
             const target = event.target;
             if (target.closest('.embed-video iframe') || 
@@ -806,7 +820,6 @@
             const message = messages.find(m => m.id === messageId);
             if (!message || message.senderId !== currentUserId) return;
             selectedMessageId = messageId;
-            const menu = document.getElementById('actionMenu');
             let x, y;
             if (event.touches) {
                 x = event.touches[0].clientX;
@@ -816,9 +829,9 @@
                 x = event.clientX;
                 y = event.clientY;
             }
-            menu.style.display = 'flex';
-            menu.style.left = (x - 70) + 'px';
-            menu.style.top = (y - 60) + 'px';
+            actionMenu.style.display = 'flex';
+            actionMenu.style.left = (x - 70) + 'px';
+            actionMenu.style.top = (y - 60) + 'px';
             setTimeout(() => {
                 document.addEventListener('click', closeActionMenu);
                 document.addEventListener('touchstart', closeActionMenu);
@@ -826,7 +839,7 @@
         }
 
         function closeActionMenu() {
-            document.getElementById('actionMenu').style.display = 'none';
+            actionMenu.style.display = 'none';
             selectedMessageId = null;
             document.removeEventListener('click', closeActionMenu);
             document.removeEventListener('touchstart', closeActionMenu);
@@ -848,7 +861,8 @@
             }
         }
 
-        window.startVoiceRecording = async function() {
+        // Voice Recording
+        async function startVoiceRecording() {
             if (isRecording) {
                 stopVoiceRecording();
                 return;
@@ -873,7 +887,7 @@
             } catch (err) {
                 showError("Microphone access denied");
             }
-        };
+        }
 
         function stopVoiceRecording() {
             if (mediaRecorder && isRecording) {
@@ -895,7 +909,8 @@
             });
         }
 
-        window.handleImageUpload = function(input) {
+        // Image Upload
+        function handleImageUpload(input) {
             const file = input.files[0];
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
@@ -903,7 +918,7 @@
                 reader.readAsDataURL(file);
             }
             input.value = '';
-        };
+        }
 
         async function sendImageMessage(imageData) {
             if (!currentUserId) return;
@@ -917,7 +932,8 @@
             });
         }
 
-        window.playVoice = function(audioData, btnElement) {
+        // Play Voice
+        function playVoice(audioData, btnElement) {
             if (currentAudio && !currentAudio.paused) {
                 currentAudio.pause();
                 currentAudio = null;
@@ -932,7 +948,7 @@
                 currentAudio = null;
                 updatePlayButtonIcon(btnElement, false);
             };
-        };
+        }
 
         function updatePlayButtonIcon(btn, isPlaying) {
             if (isPlaying) {
@@ -947,6 +963,7 @@
             }
         }
 
+        // Detect and embed links
         function detectAndEmbedLinks(text) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             const urls = text.match(urlRegex);
@@ -976,17 +993,18 @@
             return { text: processedText.trim(), embeds };
         }
 
-        window.editMessage = async function(id) {
+        // Edit Message
+        async function editMessage(id) {
             const message = messages.find(m => m.id === id);
             if (message && message.senderId === currentUserId) {
                 editingMessageId = id;
-                document.getElementById('editText').value = message.content;
-                document.getElementById('editModal').style.display = 'flex';
+                editText.value = message.content;
+                editModal.style.display = 'flex';
             }
-        };
+        }
 
-        window.saveEdit = async function() {
-            const newContent = document.getElementById('editText').value.trim();
+        async function saveEdit() {
+            const newContent = editText.value.trim();
             if (newContent && editingMessageId) {
                 const msgRef = doc(db, "messages", editingMessageId);
                 await updateDoc(msgRef, {
@@ -996,28 +1014,30 @@
                 });
                 closeEditModal();
             }
-        };
+        }
 
         function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
+            editModal.style.display = 'none';
             editingMessageId = null;
         }
 
-        window.deleteMessage = async function(id) {
+        async function deleteMessage(id) {
             const msgRef = doc(db, "messages", id);
             await deleteDoc(msgRef);
-        };
+        }
 
-        window.viewImage = function(imageData) {
-            document.getElementById('modalImage').src = imageData;
-            document.getElementById('imageModal').style.display = 'flex';
-        };
+        // View Image
+        function viewImage(imageData) {
+            modalImage.src = imageData;
+            imageModal.style.display = 'flex';
+        }
 
-        window.closeImageModal = function() {
-            document.getElementById('imageModal').style.display = 'none';
-        };
+        function closeImageModal() {
+            imageModal.style.display = 'none';
+        }
 
-        window.sendMessage = async function() {
+        // Send text message
+        async function sendMessage() {
             const content = messageInput.value.trim();
             if (!content) return;
             const { text, embeds } = detectAndEmbedLinks(content);
@@ -1032,26 +1052,9 @@
             });
             messageInput.value = '';
             messageInput.style.height = 'auto';
-        };
-
-        function loadMessagesRealtime() {
-            if (messagesUnsubscribe) messagesUnsubscribe();
-            const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
-            messagesUnsubscribe = onSnapshot(q, (snapshot) => {
-                messages = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const timestamp = data.timestamp?.toDate() || new Date();
-                    messages.push({
-                        id: doc.id,
-                        ...data,
-                        timestamp: timestamp.toISOString()
-                    });
-                });
-                renderMessages();
-            });
         }
 
+        // Render messages
         function renderMessages() {
             if (!messagesContainer) return;
             if (!messages.length) {
@@ -1063,11 +1066,11 @@
                 const isSent = msg.senderId === currentUserId;
                 let contentHtml = '';
                 if (msg.type === 'image') {
-                    contentHtml = `<img src="${msg.content}" class="message-image" onclick="viewImage('${msg.content}')" style="pointer-events: auto;">`;
+                    contentHtml = `<img src="${msg.content}" class="message-image" onclick="window.viewImageExternal('${msg.content}')" style="pointer-events: auto;">`;
                 } else if (msg.type === 'voice') {
                     contentHtml = `
                         <div class="voice-message">
-                            <button class="play-btn" onclick="playVoice('${msg.content}', this)" style="pointer-events: auto;">
+                            <button class="play-btn" onclick="window.playVoiceExternal('${msg.content}', this)" style="pointer-events: auto;">
                                 <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
                                     <polygon points="5 3 19 12 5 21 5 3" />
                                 </svg>
@@ -1103,13 +1106,15 @@
                     }
                 }
                 const editedHtml = msg.edited ? '<span class="edited-indicator">edited</span>' : '';
+                // Escape message ID for use in event handler (replace quotes)
+                const safeId = msg.id.replace(/'/g, "\\'");
                 return `
                     <div class="message ${isSent ? 'sent' : 'received'}"
-                         onmousedown="startLongPress('${msg.id}', event)"
-                         ontouchstart="startLongPress('${msg.id}', event)"
-                         onmouseup="cancelLongPress()"
-                         ontouchend="cancelLongPress()"
-                         onmouseleave="cancelLongPress()">
+                         onmousedown="window.startLongPressExternal('${safeId}', event)"
+                         ontouchstart="window.startLongPressExternal('${safeId}', event)"
+                         onmouseup="window.cancelLongPressExternal()"
+                         ontouchend="window.cancelLongPressExternal()"
+                         onmouseleave="window.cancelLongPressExternal()">
                         <div class="message-bubble">
                             <span class="message-sender">${escapeHtml(msg.senderName)}</span>
                             ${contentHtml}
@@ -1137,24 +1142,30 @@
             return div.innerHTML;
         }
 
-        window.showRegister = function() {
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-        };
+        // Real-time listener
+        function loadMessagesRealtime() {
+            if (messagesUnsubscribe) messagesUnsubscribe();
+            const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
+            messagesUnsubscribe = onSnapshot(q, (snapshot) => {
+                messages = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const timestamp = data.timestamp?.toDate() || new Date();
+                    messages.push({
+                        id: doc.id,
+                        ...data,
+                        timestamp: timestamp.toISOString()
+                    });
+                });
+                renderMessages();
+            });
+        }
 
-        window.showLogin = function() {
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-        };
-
-        window.register = async function() {
-            const username = document.getElementById('registerUsername').value.trim();
-            const password = document.getElementById('registerPassword').value;
-            const confirm = document.getElementById('confirmPassword').value;
+        // Auth functions
+        async function register() {
+            const username = registerUsername.value.trim();
+            const password = registerPassword.value;
+            const confirm = confirmPassword.value;
             if (!username || !password) return showError('Fill all fields');
             if (password !== confirm) return showError('Passwords do not match');
             
@@ -1174,17 +1185,17 @@
                     email: email
                 });
                 showSuccess('Account created! You are now logged in.');
-                document.getElementById('registerUsername').value = '';
-                document.getElementById('registerPassword').value = '';
-                document.getElementById('confirmPassword').value = '';
+                registerUsername.value = '';
+                registerPassword.value = '';
+                confirmPassword.value = '';
             } catch (err) {
                 showError(err.message);
             }
-        };
+        }
 
-        window.login = async function() {
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value;
+        async function login() {
+            const username = loginUsername.value.trim();
+            const password = loginPassword.value;
             if (!username || !password) return showError('Enter username and password');
             
             const usersRef = collection(db, "users");
@@ -1197,17 +1208,18 @@
             const email = userDoc.data().email;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                document.getElementById('loginUsername').value = '';
-                document.getElementById('loginPassword').value = '';
+                loginUsername.value = '';
+                loginPassword.value = '';
             } catch (err) {
                 showError("Invalid password");
             }
-        };
+        }
 
-        window.logout = async function() {
+        async function logout() {
             await signOut(auth);
-        };
+        }
 
+        // Auth state listener
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserId = user.uid;
@@ -1236,31 +1248,53 @@
             }
         });
 
-        if (messageInput) {
-            messageInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-            });
-            messageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    window.sendMessage();
-                }
-            });
-        }
+        // Attach event listeners
+        document.getElementById('enableNotifBtn').addEventListener('click', requestNotificationPermission);
+        document.getElementById('loginBtn').addEventListener('click', login);
+        document.getElementById('registerBtn').addEventListener('click', register);
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('showRegisterLink').addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        });
+        document.getElementById('showLoginLink').addEventListener('click', () => {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        });
+        document.getElementById('imageUploadBtn').addEventListener('click', () => imageInput.click());
+        imageInput.addEventListener('change', () => handleImageUpload(imageInput));
+        document.getElementById('micBtn').addEventListener('click', startVoiceRecording);
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('editAction').addEventListener('click', editSelectedMessage);
+        document.getElementById('deleteAction').addEventListener('click', deleteSelectedMessage);
+        document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
+        document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
+        imageModal.addEventListener('click', closeImageModal);
 
-        document.getElementById('editAction').onclick = editSelectedMessage;
-        document.getElementById('deleteAction').onclick = deleteSelectedMessage;
+        // Expose external functions for inline event handlers (they need to be on window)
+        window.startLongPressExternal = startLongPress;
+        window.cancelLongPressExternal = cancelLongPress;
+        window.viewImageExternal = viewImage;
+        window.playVoiceExternal = playVoice;
 
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Notification banner
         if (Notification.permission === "default") {
             notificationBanner.style.display = 'flex';
         } else if (Notification.permission === "granted") {
             notificationBanner.style.display = 'none';
         }
-
-        window.startLongPress = startLongPress;
-        window.cancelLongPress = cancelLongPress;
-        window.closeEditModal = closeEditModal;
     </script>
 </body>
 </html>
