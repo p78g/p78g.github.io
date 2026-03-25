@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>ShadowChat</title>
     <style>
         * {
@@ -225,17 +225,13 @@
             flex-direction: column;
         }
 
-        /* Message Bubbles - Tap to edit/delete */
+        /* Message Bubbles - Long press for menu */
         .message {
             display: flex;
             margin-bottom: 12px;
             animation: fadeIn 0.2s ease;
             position: relative;
-            cursor: pointer;
-        }
-
-        .message:active {
-            opacity: 0.7;
+            user-select: none;
         }
 
         .message.sent {
@@ -252,7 +248,6 @@
             border-radius: 18px;
             position: relative;
             word-wrap: break-word;
-            pointer-events: none;
         }
 
         .message.sent .message-bubble {
@@ -757,6 +752,8 @@
         let isRecording = false;
         let selectedMessageId = null;
         let currentAudio = null;
+        let pressTimer = null;
+        let longPressTriggered = false;
 
         // Notification System
         function requestNotificationPermission() {
@@ -770,7 +767,32 @@
             });
         }
 
-        // Action Menu - Show on tap (single click)
+        // Long press handlers
+        function startLongPress(messageId, event) {
+            // Ignore if the target is inside an interactive element (iframe, link, image, play button)
+            const target = event.target;
+            if (target.closest('.embed-video iframe') || 
+                target.closest('.embed-link') || 
+                target.closest('.message-image') || 
+                target.closest('.play-btn')) {
+                return;
+            }
+            
+            longPressTriggered = false;
+            pressTimer = setTimeout(() => {
+                longPressTriggered = true;
+                showActionMenu(messageId, event);
+            }, 500);
+        }
+        
+        function cancelLongPress() {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
+        }
+        
+        // Action Menu
         function showActionMenu(messageId, event) {
             const message = messages.find(m => m.id === messageId);
             if (!message || message.sender !== currentUser) return;
@@ -822,7 +844,7 @@
             }
         }
         
-        // Voice Recording with SVG Play/Pause
+        // Voice Recording
         async function startVoiceRecording() {
             if (isRecording) {
                 stopVoiceRecording();
@@ -1255,7 +1277,12 @@
                 const editedHtml = msg.edited ? '<span class="edited-indicator">edited</span>' : '';
                 
                 return `
-                    <div class="message ${isSent ? 'sent' : 'received'}" onclick="showActionMenu(${msg.id}, event)">
+                    <div class="message ${isSent ? 'sent' : 'received'}"
+                         onmousedown="startLongPress(${msg.id}, event)"
+                         ontouchstart="startLongPress(${msg.id}, event)"
+                         onmouseup="cancelLongPress()"
+                         ontouchend="cancelLongPress()"
+                         onmouseleave="cancelLongPress()">
                         <div class="message-bubble">
                             <span class="message-sender">${escapeHtml(msg.sender)}</span>
                             ${contentHtml}
