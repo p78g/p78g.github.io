@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>ShadowChat - Public & Private Chats</title>
+    <title>ShadowChat - Friend System</title>
     <style>
         * {
             margin: 0;
@@ -119,7 +119,7 @@
         }
 
         .sidebar {
-            width: 300px;
+            width: 320px;
             background: #1a1a1a;
             border-right: 1px solid #2a2a2a;
             display: flex;
@@ -155,22 +155,117 @@
             color: white;
         }
 
-        .new-chat-btn {
-            width: 100%;
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: #2a2a2a;
+            padding: 8px;
+            border: none;
+            border-radius: 12px;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .tab-btn.active {
             background: #25D366;
-            padding: 10px;
+            color: white;
+        }
+
+        .add-friend-section {
+            background: #2a2a2a;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .add-friend-input {
+            display: flex;
+            gap: 8px;
+        }
+
+        .add-friend-input input {
+            flex: 1;
+            padding: 10px 12px;
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .add-friend-btn {
+            background: #25D366;
+            padding: 8px 16px;
             border-radius: 12px;
             border: none;
             color: white;
-            font-weight: 600;
             cursor: pointer;
-            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .friend-requests {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .friend-requests h4 {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .request-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .request-username {
+            color: white;
+            font-weight: 500;
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .accept-btn, .decline-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .accept-btn {
+            background: #25D366;
+        }
+
+        .decline-btn {
+            background: #f87171;
         }
 
         .chats-list {
             flex: 1;
             overflow-y: auto;
-            padding: 12px;
         }
 
         .chat-item {
@@ -481,35 +576,10 @@
             max-width: 400px;
         }
 
-        .user-search {
-            width: 100%;
-            padding: 12px;
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            border-radius: 12px;
-            color: white;
-            margin: 16px 0;
-        }
-
-        .user-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .user-item {
-            padding: 12px;
-            cursor: pointer;
-            border-radius: 8px;
-        }
-
-        .user-item:hover {
-            background: #2a2a2a;
-        }
-
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
-                left: -300px;
+                left: -320px;
                 top: 0;
                 bottom: 0;
                 z-index: 50;
@@ -523,7 +593,6 @@
             }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/4.2.0/parse.min.js"></script>
 </head>
 <body>
@@ -573,14 +642,49 @@
                     <span class="username-display" id="sidebarUsername"></span>
                     <button class="logout-btn" id="sidebarLogout">Exit</button>
                 </div>
-                <button class="new-chat-btn" id="newChatBtn">+ New Private Chat</button>
+                
+                <div class="nav-tabs">
+                    <button class="tab-btn active" id="chatsTab">Chats</button>
+                    <button class="tab-btn" id="friendsTab">Friends</button>
+                </div>
+                
+                <div id="chatsPanel">
+                    <div class="chats-list" id="chatsList"></div>
+                </div>
+                
+                <div id="friendsPanel" style="display:none;">
+                    <div class="add-friend-section">
+                        <div class="add-friend-input">
+                            <input type="text" id="friendUsername" placeholder="Enter username">
+                            <button id="addFriendBtn" class="add-friend-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                    <path d="M12 5v14M5 12h14"/>
+                                </svg>
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="friend-requests" id="friendRequests">
+                        <h4>Friend Requests</h4>
+                        <div id="requestsList"></div>
+                    </div>
+                    
+                    <div class="friend-requests">
+                        <h4>Your Friends</h4>
+                        <div id="friendsList"></div>
+                    </div>
+                </div>
             </div>
-            <div class="chats-list" id="chatsList"></div>
         </div>
 
         <div class="main-chat">
             <div class="chat-header">
-                <button class="back-btn" id="backBtn">← Back</button>
+                <button class="back-btn" id="backBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
                 <div>
                     <div class="chat-title" id="chatTitle">Select a chat</div>
                     <div class="chat-subtitle" id="chatSubtitle"></div>
@@ -614,16 +718,6 @@
 
     <input type="file" id="imageFile" accept="image/*" style="display:none;">
     
-    <!-- New Chat Modal -->
-    <div id="newChatModal" class="modal">
-        <div class="modal-content">
-            <h3 style="color:white; margin-bottom:16px;">Start a Private Chat</h3>
-            <input type="text" id="userSearch" class="user-search" placeholder="Search users...">
-            <div id="userList" class="user-list"></div>
-            <button id="closeModalBtn" style="margin-top:16px; background:#3a3a3a; color:white; padding:10px; border:none; border-radius:12px; cursor:pointer;">Cancel</button>
-        </div>
-    </div>
-
     <!-- Action Menu -->
     <div id="actionMenu" class="action-menu">
         <button id="editAction" class="action-menu-item">Edit</button>
@@ -644,7 +738,6 @@
     </div>
 
     <script>
-        // Initialize Parse with your Back4App credentials
         Parse.initialize("af3nhQVRaFT5o5ZjYyQfztZZSMxCNT6VFhevLQvZ", "AjRAxMvX8gNQMIGHcJ0icjaIZRa8og37GF9wjDLU");
         Parse.serverURL = 'https://parseapi.back4app.com/';
 
@@ -658,6 +751,7 @@
         let mediaRecorder = null;
         let audioChunks = [];
         let isRecording = false;
+        let refreshInterval = null;
 
         // DOM Elements
         const authScreen = document.getElementById('authScreen');
@@ -674,8 +768,9 @@
         const actionMenu = document.getElementById('actionMenu');
         const editModal = document.getElementById('editModal');
         const editText = document.getElementById('editText');
+        const requestsList = document.getElementById('requestsList');
+        const friendsList = document.getElementById('friendsList');
 
-        // Helper functions
         function showError(msg) {
             authError.textContent = msg;
             authError.style.display = 'block';
@@ -728,19 +823,66 @@
             return { text: processedText.trim(), embeds };
         }
 
+        // Load friends and requests
+        async function loadFriendsAndRequests() {
+            if (!currentUser) return;
+            
+            // Load friend requests
+            const FriendRequest = Parse.Object.extend("FriendRequest");
+            const reqQuery = new Parse.Query(FriendRequest);
+            reqQuery.equalTo("toUser", currentUser.id);
+            reqQuery.equalTo("status", "pending");
+            const requests = await reqQuery.find();
+            
+            requestsList.innerHTML = '';
+            for (const req of requests) {
+                const fromUser = await req.get("fromUser").fetch();
+                const div = document.createElement('div');
+                div.className = 'request-item';
+                div.innerHTML = `
+                    <span class="request-username">${escapeHtml(fromUser.get('username'))}</span>
+                    <div class="request-actions">
+                        <button class="accept-btn" onclick="acceptFriendRequest('${req.id}')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </button>
+                        <button class="decline-btn" onclick="declineFriendRequest('${req.id}')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                requestsList.appendChild(div);
+            }
+            
+            // Load friends
+            const Friend = Parse.Object.extend("Friend");
+            const friendQuery = new Parse.Query(Friend);
+            friendQuery.equalTo("userId", currentUser.id);
+            const friends = await friendQuery.find();
+            
+            friendsList.innerHTML = '';
+            for (const friend of friends) {
+                const friendUser = await friend.get("friendUser").fetch();
+                const div = document.createElement('div');
+                div.className = 'chat-item';
+                div.innerHTML = `<div class="chat-name">${escapeHtml(friendUser.get('username'))}</div>`;
+                div.onclick = () => startPrivateChat(friendUser.get('username'));
+                friendsList.appendChild(div);
+            }
+        }
+
         // Load chats
         async function loadChats() {
             if (!currentUser) return;
             
-            const PublicChat = Parse.Object.extend("PublicChat");
-            const query = new Parse.Query(PublicChat);
-            query.equalTo("participants", currentUser.id);
-            const publicChats = await query.find();
-            
-            const PrivateChat = Parse.Object.extend("PrivateChat");
-            const privateQuery = new Parse.Query(PrivateChat);
-            privateQuery.contains("participants", currentUser.id);
-            const privateChats = await privateQuery.find();
+            const Friend = Parse.Object.extend("Friend");
+            const friendQuery = new Parse.Query(Friend);
+            friendQuery.equalTo("userId", currentUser.id);
+            const friends = await friendQuery.find();
             
             chatsList.innerHTML = '';
             
@@ -748,25 +890,23 @@
             const publicDiv = document.createElement('div');
             publicDiv.className = `chat-item ${currentChat === 'public' ? 'active' : ''}`;
             publicDiv.innerHTML = `
-                <div class="chat-name">🌐 Public Chat</div>
+                <div class="chat-name">Public Chat</div>
                 <div class="chat-type">Everyone can see</div>
             `;
             publicDiv.onclick = () => openChat('public', null, 'Public Chat');
             chatsList.appendChild(publicDiv);
             
-            // Private Chats
-            for (const chat of privateChats) {
-                const participants = chat.get('participants');
-                const otherId = participants.find(p => p !== currentUser.id);
-                const otherUser = await new Parse.Query(Parse.User).get(otherId);
-                const chatName = otherUser.get('username');
+            // Friend Chats
+            for (const friend of friends) {
+                const friendUser = await friend.get("friendUser").fetch();
+                const chatId = [currentUser.id, friendUser.id].sort().join('_');
                 const div = document.createElement('div');
-                div.className = `chat-item ${currentChat === chat.id ? 'active' : ''}`;
+                div.className = `chat-item ${currentChat === chatId ? 'active' : ''}`;
                 div.innerHTML = `
-                    <div class="chat-name">🔒 ${escapeHtml(chatName)}</div>
+                    <div class="chat-name">${escapeHtml(friendUser.get('username'))}</div>
                     <div class="chat-type">Private chat</div>
                 `;
-                div.onclick = () => openChat('private', chat.id, chatName);
+                div.onclick = () => openChat('private', chatId, friendUser.get('username'));
                 chatsList.appendChild(div);
             }
         }
@@ -830,7 +970,20 @@
             
             let contentHtml = `<div class="message-content">${escapeHtml(text)}</div>`;
             
-            if (embeds && embeds.length > 0) {
+            if (messageType === 'image') {
+                contentHtml = `<img src="${content}" class="message-image" onclick="window.open('${content}')">`;
+            } else if (messageType === 'voice') {
+                contentHtml = `
+                    <div class="voice-message">
+                        <button class="play-btn" onclick="playVoice('${content}', this)">
+                            <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                        </button>
+                        <span>Voice note</span>
+                    </div>
+                `;
+            } else if (embeds && embeds.length > 0) {
                 embeds.forEach(embed => {
                     if (embed.type === 'youtube') {
                         contentHtml += `
@@ -853,14 +1006,12 @@
             
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
-            messageDiv.onclick = (e) => {
-                e.stopPropagation();
-                if (isSent) {
+            if (isSent) {
+                messageDiv.onclick = (e) => {
+                    e.stopPropagation();
                     showActionMenu(messageId, content, e);
-                } else if (currentChatType === 'public') {
-                    startPrivateChat(senderName);
-                }
-            };
+                };
+            }
             messageDiv.innerHTML = `
                 <div class="message-bubble">
                     <span class="message-sender">${escapeHtml(senderName)}</span>
@@ -929,59 +1080,106 @@
             selectedMessage = null;
         }
 
-        // Start private chat
-        async function startPrivateChat(username) {
-            if (username === currentUser.get('username')) {
-                showError("You can't chat with yourself");
-                return;
-            }
+        // Friend request functions
+        window.acceptFriendRequest = async function(requestId) {
+            const FriendRequest = Parse.Object.extend("FriendRequest");
+            const req = new FriendRequest();
+            req.id = requestId;
+            const fromUser = await req.get("fromUser").fetch();
+            
+            // Add to friends list for both users
+            const Friend = Parse.Object.extend("Friend");
+            const friend1 = new Friend();
+            friend1.set("userId", currentUser.id);
+            friend1.set("friendUser", fromUser);
+            await friend1.save();
+            
+            const friend2 = new Friend();
+            friend2.set("userId", fromUser.id);
+            friend2.set("friendUser", currentUser);
+            await friend2.save();
+            
+            // Delete the request
+            await req.destroy();
+            
+            showSuccess(`You are now friends with ${fromUser.get('username')}`);
+            await loadFriendsAndRequests();
+            await loadChats();
+        };
+        
+        window.declineFriendRequest = async function(requestId) {
+            const FriendRequest = Parse.Object.extend("FriendRequest");
+            const req = new FriendRequest();
+            req.id = requestId;
+            await req.destroy();
+            await loadFriendsAndRequests();
+        };
+        
+        async function sendFriendRequest() {
+            const username = document.getElementById('friendUsername').value.trim();
+            if (!username) return showError('Enter a username');
+            if (username === currentUser.get('username')) return showError('You cannot add yourself');
             
             const userQuery = new Parse.Query(Parse.User);
             userQuery.equalTo("username", username);
-            const otherUser = await userQuery.first();
+            const targetUser = await userQuery.first();
+            if (!targetUser) return showError('User not found');
             
-            if (!otherUser) return;
+            // Check if already friends
+            const Friend = Parse.Object.extend("Friend");
+            const friendQuery = new Parse.Query(Friend);
+            friendQuery.equalTo("userId", currentUser.id);
+            friendQuery.equalTo("friendUser", targetUser);
+            const existingFriend = await friendQuery.first();
+            if (existingFriend) return showError('Already friends with this user');
             
-            const PrivateChat = Parse.Object.extend("PrivateChat");
-            const query = new Parse.Query(PrivateChat);
-            query.contains("participants", currentUser.id);
-            query.contains("participants", otherUser.id);
-            const existing = await query.first();
+            // Check if request already sent
+            const FriendRequest = Parse.Object.extend("FriendRequest");
+            const reqQuery = new Parse.Query(FriendRequest);
+            reqQuery.equalTo("fromUser", currentUser);
+            reqQuery.equalTo("toUser", targetUser);
+            reqQuery.equalTo("status", "pending");
+            const existingReq = await reqQuery.first();
+            if (existingReq) return showError('Friend request already sent');
             
-            if (existing) {
-                openChat('private', existing.id, username);
-            } else {
-                const newChat = new PrivateChat();
-                newChat.set("participants", [currentUser.id, otherUser.id]);
-                await newChat.save();
-                openChat('private', newChat.id, username);
-            }
-            loadChats();
-            document.getElementById('newChatModal').style.display = 'none';
+            // Send friend request
+            const request = new FriendRequest();
+            request.set("fromUser", currentUser);
+            request.set("toUser", targetUser);
+            request.set("status", "pending");
+            await request.save();
+            
+            showSuccess(`Friend request sent to ${username}`);
+            document.getElementById('friendUsername').value = '';
         }
-
-        // Load users for new chat
-        async function loadUsers(searchTerm) {
-            const query = new Parse.Query(Parse.User);
-            query.notEqualTo("objectId", currentUser.id);
-            if (searchTerm) {
-                query.startsWith("username", searchTerm);
-            }
-            query.limit(20);
-            const users = await query.find();
+        
+        async function startPrivateChat(username) {
+            const userQuery = new Parse.Query(Parse.User);
+            userQuery.equalTo("username", username);
+            const targetUser = await userQuery.first();
+            if (!targetUser) return;
             
-            const userList = document.getElementById('userList');
-            userList.innerHTML = '';
-            for (const user of users) {
-                const div = document.createElement('div');
-                div.className = 'user-item';
-                div.textContent = user.get('username');
-                div.onclick = () => startPrivateChat(user.get('username'));
-                userList.appendChild(div);
+            const chatId = [currentUser.id, targetUser.id].sort().join('_');
+            openChat('private', chatId, username);
+            
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
             }
         }
 
         // Voice recording
+        function playVoice(audioData, btn) {
+            const audio = new Audio(audioData);
+            audio.play();
+            btn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+            audio.onended = () => {
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="white" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
+            };
+        }
+        
+        window.playVoice = playVoice;
+        
         async function startVoiceRecording() {
             if (isRecording) {
                 if (mediaRecorder) mediaRecorder.stop();
@@ -1028,6 +1226,8 @@
                 showError("Microphone access denied");
             }
         }
+        
+        window.startVoiceRecording = startVoiceRecording;
 
         // Image upload
         function handleImageUpload(file) {
@@ -1084,8 +1284,18 @@
                 sidebarUsername.textContent = user.get('username');
                 authScreen.style.display = 'none';
                 mainApp.style.display = 'flex';
+                await loadFriendsAndRequests();
                 await loadChats();
                 openChat('public', null, 'Public Chat');
+                
+                // Auto-refresh every 5 seconds
+                if (refreshInterval) clearInterval(refreshInterval);
+                refreshInterval = setInterval(async () => {
+                    if (currentUser) {
+                        await loadFriendsAndRequests();
+                        await loadChats();
+                    }
+                }, 5000);
             } catch (err) {
                 showError('Invalid username or password');
             }
@@ -1093,6 +1303,7 @@
 
         async function logout() {
             await Parse.User.logOut();
+            if (refreshInterval) clearInterval(refreshInterval);
             currentUser = null;
             authScreen.style.display = 'flex';
             mainApp.style.display = 'none';
@@ -1100,10 +1311,23 @@
             document.getElementById('loginPassword').value = '';
         }
 
-        // Event Listeners
-        document.getElementById('loginBtn').onclick = () => {
-            login(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value);
+        // Tab switching
+        document.getElementById('chatsTab').onclick = () => {
+            document.getElementById('chatsTab').classList.add('active');
+            document.getElementById('friendsTab').classList.remove('active');
+            document.getElementById('chatsPanel').style.display = 'block';
+            document.getElementById('friendsPanel').style.display = 'none';
         };
+        document.getElementById('friendsTab').onclick = () => {
+            document.getElementById('friendsTab').classList.add('active');
+            document.getElementById('chatsTab').classList.remove('active');
+            document.getElementById('chatsPanel').style.display = 'none';
+            document.getElementById('friendsPanel').style.display = 'block';
+            loadFriendsAndRequests();
+        };
+
+        // Event Listeners
+        document.getElementById('loginBtn').onclick = () => login(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value);
         document.getElementById('registerBtn').onclick = register;
         document.getElementById('sidebarLogout').onclick = logout;
         document.getElementById('sendBtn').onclick = sendMessage;
@@ -1118,12 +1342,7 @@
         document.getElementById('imageBtn').onclick = () => document.getElementById('imageFile').click();
         document.getElementById('voiceBtn').onclick = startVoiceRecording;
         document.getElementById('imageFile').onchange = (e) => handleImageUpload(e.target.files[0]);
-        document.getElementById('newChatBtn').onclick = async () => {
-            await loadUsers('');
-            document.getElementById('newChatModal').style.display = 'flex';
-        };
-        document.getElementById('userSearch').oninput = (e) => loadUsers(e.target.value);
-        document.getElementById('closeModalBtn').onclick = () => document.getElementById('newChatModal').style.display = 'none';
+        document.getElementById('addFriendBtn').onclick = sendFriendRequest;
         document.getElementById('backBtn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
         
         // Edit/Delete actions
@@ -1138,7 +1357,7 @@
             if (selectedMessage && confirm('Delete this message?')) {
                 await deleteMessage(selectedMessage.id);
                 closeActionMenu();
-                window.location.reload();
+                location.reload();
             }
         };
         document.getElementById('saveEditBtn').onclick = async () => {
@@ -1146,7 +1365,7 @@
             if (newContent && selectedMessage) {
                 await editMessage(selectedMessage.id, newContent);
                 editModal.style.display = 'none';
-                window.location.reload();
+                location.reload();
             }
         };
         document.getElementById('cancelEditBtn').onclick = () => editModal.style.display = 'none';
@@ -1173,8 +1392,16 @@
             sidebarUsername.textContent = currentUser.get('username');
             authScreen.style.display = 'none';
             mainApp.style.display = 'flex';
+            loadFriendsAndRequests();
             loadChats();
             openChat('public', null, 'Public Chat');
+            
+            refreshInterval = setInterval(async () => {
+                if (currentUser) {
+                    await loadFriendsAndRequests();
+                    await loadChats();
+                }
+            }, 5000);
         }
     </script>
 </body>
