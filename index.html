@@ -19,91 +19,105 @@
             overflow: hidden;
         }
 
-        .app-main {
+        /* Auth Screen */
+        .auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0a0a0a;
             display: flex;
-            height: 100vh;
-            width: 100%;
-        }
-
-        /* Sidebar - Chat List */
-        .sidebar {
-            width: 300px;
-            background: #1a1a1a;
-            border-right: 1px solid #2a2a2a;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        .user-info {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            justify-content: center;
+            z-index: 100;
         }
 
-        .username-display {
-            color: #25D366;
-            font-weight: 600;
-            background: rgba(37, 211, 102, 0.1);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+        .auth-box {
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 380px;
         }
 
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            border: none;
+        .auth-box h1 {
+            background: linear-gradient(135deg, #a78bfa, #ec489a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            font-size: 15px;
             color: white;
-            font-size: 14px;
         }
 
-        .chats-list {
-            flex: 1;
-            overflow-y: auto;
+        .input-group input:focus {
+            outline: none;
+            border-color: #25D366;
+        }
+
+        .auth-btn {
+            background: #25D366;
+            color: white;
             padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
         }
 
-        .chat-item {
+        .switch-auth {
+            text-align: center;
+            margin-top: 20px;
+            color: #9ca3af;
+        }
+
+        .switch-auth a {
+            color: #25D366;
+            cursor: pointer;
+        }
+
+        .error-msg, .success-msg {
             padding: 12px;
             border-radius: 12px;
-            cursor: pointer;
-            margin-bottom: 4px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
         }
 
-        .chat-item:hover {
-            background: #2a2a2a;
+        .error-msg {
+            background: rgba(248, 113, 113, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.2);
         }
 
-        .chat-item.active {
-            background: #2a2a2a;
-            border-left: 3px solid #25D366;
+        .success-msg {
+            background: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.2);
         }
 
-        .chat-name {
-            font-weight: 600;
-            color: white;
-            font-size: 15px;
-        }
-
-        .chat-type {
-            font-size: 11px;
-            color: #9ca3af;
-            margin-top: 4px;
-        }
-
-        /* Main Chat Area */
-        .main-chat {
-            flex: 1;
-            display: flex;
+        /* Main App - Full Screen Chat */
+        .app-main {
+            display: none;
             flex-direction: column;
+            height: 100vh;
+            width: 100%;
             background: #0a0a0a;
         }
 
@@ -112,8 +126,8 @@
             padding: 16px 20px;
             border-bottom: 1px solid #2a2a2a;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
         }
 
         .chat-title {
@@ -122,9 +136,29 @@
             color: white;
         }
 
-        .chat-subtitle {
-            font-size: 12px;
-            color: #9ca3af;
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .username-display {
+            color: #25D366;
+            font-weight: 600;
+            background: rgba(37, 211, 102, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-size: 14px;
         }
 
         .messages-container {
@@ -341,6 +375,11 @@
             max-height: 100px;
         }
 
+        .message-input:focus {
+            outline: none;
+            border-color: #25D366;
+        }
+
         .send-btn {
             background: #25D366;
             padding: 12px 24px;
@@ -372,119 +411,19 @@
             max-width: 400px;
         }
 
-        .auth-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #0a0a0a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-
-        .auth-box {
-            background: #1a1a1a;
-            padding: 40px;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 380px;
-        }
-
-        .auth-box h1 {
-            background: linear-gradient(135deg, #a78bfa, #ec489a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 32px;
-            text-align: center;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px 16px;
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            border-radius: 12px;
-            font-size: 15px;
-            color: white;
-        }
-
-        .auth-btn {
-            background: #25D366;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .switch-auth {
-            text-align: center;
-            margin-top: 20px;
-            color: #9ca3af;
-        }
-
-        .switch-auth a {
-            color: #25D366;
-            cursor: pointer;
-        }
-
-        .error-msg, .success-msg {
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 14px;
-        }
-
-        .error-msg {
-            background: rgba(248, 113, 113, 0.1);
-            color: #f87171;
-            border: 1px solid rgba(248, 113, 113, 0.2);
-        }
-
-        .success-msg {
-            background: rgba(74, 222, 128, 0.1);
-            color: #4ade80;
-            border: 1px solid rgba(74, 222, 128, 0.2);
-        }
-
         @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: -300px;
-                top: 0;
-                bottom: 0;
-                z-index: 50;
-                transition: left 0.3s;
+            .message-bubble {
+                max-width: 85%;
             }
-            .sidebar.open {
-                left: 0;
+            .chat-header {
+                padding: 12px 16px;
             }
-            .menu-btn {
-                display: block;
+            .messages-container {
+                padding: 12px;
             }
-        }
-
-        .menu-btn {
-            display: none;
-            background: #2a2a2a;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-            color: white;
+            .message-input-container {
+                padding: 12px;
+            }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/4.2.0/parse.min.js"></script>
@@ -528,53 +467,37 @@
         </div>
     </div>
 
-    <!-- Main App -->
+    <!-- Main App - Full Screen Chat -->
     <div id="mainApp" class="app-main" style="display:none;">
-        <div id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <div class="user-info">
-                    <span class="username-display" id="sidebarUsername"></span>
-                    <button class="logout-btn" id="sidebarLogout">Exit</button>
-                </div>
+        <div class="chat-header">
+            <div class="chat-title">Public Chat</div>
+            <div class="user-controls">
+                <span class="username-display" id="sidebarUsername"></span>
+                <button class="logout-btn" id="sidebarLogout">Exit</button>
             </div>
-            <div class="chats-list" id="chatsList"></div>
         </div>
-
-        <div class="main-chat">
-            <div class="chat-header">
-                <button class="menu-btn" id="menuBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                        <line x1="3" y1="12" x2="21" y2="12"/>
-                        <line x1="3" y1="6" x2="21" y2="6"/>
-                        <line x1="3" y1="18" x2="21" y2="18"/>
+        <div class="messages-container" id="messagesContainer">
+            <div style="text-align:center; color:#6b7280; padding:40px;">Loading messages...</div>
+        </div>
+        <div class="message-input-container">
+            <div class="input-buttons">
+                <button class="icon-btn" id="imageBtn">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
+                        <circle cx="8.5" cy="8.5" r="2.5" />
+                        <path d="M21 15l-5-4-3 3-4-4-5 5" />
                     </svg>
                 </button>
-                <div>
-                    <div class="chat-title" id="chatTitle">Public Chat</div>
-                    <div class="chat-subtitle" id="chatSubtitle">Everyone can see</div>
-                </div>
+                <button class="icon-btn" id="voiceBtn">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z" />
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                        <line x1="12" y1="19" x2="12" y2="22" />
+                    </svg>
+                </button>
             </div>
-            <div class="messages-container" id="messagesContainer"></div>
-            <div class="message-input-container">
-                <div class="input-buttons">
-                    <button class="icon-btn" id="imageBtn">
-                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" />
-                            <circle cx="8.5" cy="8.5" r="2.5" />
-                            <path d="M21 15l-5-4-3 3-4-4-5 5" />
-                        </svg>
-                    </button>
-                    <button class="icon-btn" id="voiceBtn">
-                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z" />
-                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                            <line x1="12" y1="19" x2="12" y2="22" />
-                        </svg>
-                    </button>
-                </div>
-                <textarea id="messageInput" class="message-input" rows="1" placeholder="Type a message..."></textarea>
-                <button id="sendBtn" class="send-btn">Send</button>
-            </div>
+            <textarea id="messageInput" class="message-input" rows="1" placeholder="Type a message..."></textarea>
+            <button id="sendBtn" class="send-btn">Send</button>
         </div>
     </div>
 
@@ -616,17 +539,12 @@
         const mainApp = document.getElementById('mainApp');
         const authError = document.getElementById('authError');
         const authSuccess = document.getElementById('authSuccess');
-        const chatsList = document.getElementById('chatsList');
         const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
-        const chatTitle = document.getElementById('chatTitle');
-        const chatSubtitle = document.getElementById('chatSubtitle');
         const sidebarUsername = document.getElementById('sidebarUsername');
         const actionMenu = document.getElementById('actionMenu');
         const editModal = document.getElementById('editModal');
         const editText = document.getElementById('editText');
-        const sidebar = document.getElementById('sidebar');
-        const menuBtn = document.getElementById('menuBtn');
 
         function showError(msg) {
             authError.textContent = msg;
@@ -680,34 +598,9 @@
             return { text: processedText.trim(), embeds };
         }
 
-        // Load chats (only public chat for now)
-        async function loadChats() {
-            if (!currentUser) return;
-            
-            chatsList.innerHTML = '';
-            
-            // Public Chat
-            const publicDiv = document.createElement('div');
-            publicDiv.className = `chat-item active`;
-            publicDiv.innerHTML = `
-                <div class="chat-name">Public Chat</div>
-                <div class="chat-type">Everyone can see</div>
-            `;
-            publicDiv.onclick = () => openPublicChat();
-            chatsList.appendChild(publicDiv);
-        }
-
-        // Open public chat
-        async function openPublicChat() {
-            if (messagesSubscription) {
-                messagesSubscription.unsubscribe();
-            }
-            
-            chatTitle.textContent = "Public Chat";
-            chatSubtitle.textContent = "Everyone can see";
-            
+        // Load messages
+        async function loadMessages() {
             try {
-                // Load messages
                 const Message = Parse.Object.extend("Message");
                 const query = new Parse.Query(Message);
                 query.equalTo("chatType", "public");
@@ -721,13 +614,6 @@
                 for (const msg of messagesList) {
                     appendMessage(msg);
                 }
-                
-                // Subscribe to new messages
-                const subscription = await query.subscribe();
-                subscription.on('create', (msg) => {
-                    appendMessage(msg);
-                });
-                messagesSubscription = subscription;
                 
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             } catch (err) {
@@ -834,7 +720,7 @@
                 msg.set("content", newContent);
                 msg.set("edited", true);
                 await msg.save();
-                await openPublicChat(); // Refresh messages
+                await loadMessages();
             } catch (err) {
                 showError("Error editing message");
             }
@@ -846,7 +732,7 @@
                 const query = new Parse.Query("Message");
                 const msg = await query.get(messageId);
                 await msg.destroy();
-                await openPublicChat(); // Refresh messages
+                await loadMessages();
             } catch (err) {
                 showError("Error deleting message");
             }
@@ -942,6 +828,26 @@
             }
         }
 
+        // Setup real-time subscription
+        function setupRealtimeSubscription() {
+            if (messagesSubscription) {
+                messagesSubscription.unsubscribe();
+            }
+            
+            const Message = Parse.Object.extend("Message");
+            const query = new Parse.Query(Message);
+            query.equalTo("chatType", "public");
+            
+            query.subscribe().then(subscription => {
+                messagesSubscription = subscription;
+                subscription.on('create', (msg) => {
+                    appendMessage(msg);
+                });
+            }).catch(err => {
+                console.error("Subscription error:", err);
+            });
+        }
+
         // Auth functions
         async function register() {
             const username = document.getElementById('regUsername').value.trim();
@@ -971,14 +877,14 @@
                 sidebarUsername.textContent = user.get('username');
                 authScreen.style.display = 'none';
                 mainApp.style.display = 'flex';
-                await loadChats();
-                await openPublicChat();
+                await loadMessages();
+                setupRealtimeSubscription();
                 
-                // Auto-refresh every 3 seconds
+                // Auto-refresh every 3 seconds as backup
                 if (refreshInterval) clearInterval(refreshInterval);
                 refreshInterval = setInterval(async () => {
                     if (currentUser) {
-                        await openPublicChat();
+                        await loadMessages();
                     }
                 }, 3000);
             } catch (err) {
@@ -989,26 +895,13 @@
         async function logout() {
             await Parse.User.logOut();
             if (refreshInterval) clearInterval(refreshInterval);
+            if (messagesSubscription) messagesSubscription.unsubscribe();
             currentUser = null;
             authScreen.style.display = 'flex';
             mainApp.style.display = 'none';
             document.getElementById('loginUsername').value = '';
             document.getElementById('loginPassword').value = '';
         }
-
-        // Menu toggle for mobile
-        menuBtn.onclick = () => {
-            sidebar.classList.toggle('open');
-        };
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
-                    sidebar.classList.remove('open');
-                }
-            }
-        });
 
         // Event Listeners
         document.getElementById('loginBtn').onclick = () => login(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value);
@@ -1072,12 +965,12 @@
             sidebarUsername.textContent = currentUser.get('username');
             authScreen.style.display = 'none';
             mainApp.style.display = 'flex';
-            loadChats();
-            openPublicChat();
+            loadMessages();
+            setupRealtimeSubscription();
             
             refreshInterval = setInterval(async () => {
                 if (currentUser) {
-                    await openPublicChat();
+                    await loadMessages();
                 }
             }, 3000);
         }
