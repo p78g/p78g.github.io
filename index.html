@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>ShadowChat</title>
+    <title>ShadowChat V2</title>
     <style>
         * {
             margin: 0;
@@ -607,7 +607,7 @@
     <div class="container">
         <div id="authSection" class="auth-container">
             <div class="auth-form">
-                <h1 class="visually-hidden">ShadowChat</h1>
+                <h1 class="visually-hidden">ShadowChat V2</h1>
                 <div id="notificationBanner" class="notification-banner" style="display: none;">
                     <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -760,7 +760,6 @@
         const modalImage = document.getElementById('modalImage');
 
         // Global state
-        let currentUserObj = null;
         let currentUserId = null;
         let currentUsername = "";
         let messages = [];
@@ -1106,7 +1105,6 @@
                     }
                 }
                 const editedHtml = msg.edited ? '<span class="edited-indicator">edited</span>' : '';
-                // Escape message ID for use in event handler (replace quotes)
                 const safeId = msg.id.replace(/'/g, "\\'");
                 return `
                     <div class="message ${isSent ? 'sent' : 'received'}"
@@ -1231,7 +1229,6 @@
                 } else {
                     currentUsername = user.email.split('@')[0];
                 }
-                currentUserObj = user;
                 authSection.style.display = 'none';
                 appSection.style.display = 'flex';
                 currentUsernameSpan.textContent = currentUsername;
@@ -1240,7 +1237,6 @@
                 if (messagesUnsubscribe) messagesUnsubscribe();
                 authSection.style.display = 'flex';
                 appSection.style.display = 'none';
-                currentUserObj = null;
                 currentUserId = null;
                 currentUsername = "";
                 messages = [];
@@ -1271,7 +1267,7 @@
         document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
         imageModal.addEventListener('click', closeImageModal);
 
-        // Expose external functions for inline event handlers (they need to be on window)
+        // Expose external functions for inline event handlers
         window.startLongPressExternal = startLongPress;
         window.cancelLongPressExternal = cancelLongPress;
         window.viewImageExternal = viewImage;
